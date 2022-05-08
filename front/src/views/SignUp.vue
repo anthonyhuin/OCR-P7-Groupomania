@@ -5,6 +5,8 @@ import { useField, useForm } from "vee-validate";
 
 const validationSchema = toFormValidator(
   z.object({
+    firstname: z.string({ required_error: "Vous devez renseigner ce champ firstname" }).min(2, "Trop court"),
+    lastname: z.string({ required_error: "Vous devez renseigner ce champ lastname" }).min(2, "Trop court"),
     email: z.string({ required_error: "Vous devez renseigner le champ email" }).email("Format email incorrect"),
     password: z.string({ required_error: "Vous devez renseigner ce champ signuppassword" }).min(5, "Le mot de passe doit faire au moins 5 caractères"),
   })
@@ -13,11 +15,13 @@ const validationSchema = toFormValidator(
 const { handleSubmit, setErrors } = useForm({
   validationSchema,
 });
-const { handleBlur } = useField("email");
+
 const submit = handleSubmit(async (formValue) => {
   console.log(formValue);
 });
 
+const { value: firstNameValue, errorMessage: firstNameError } = useField("firstname");
+const { value: lastNameValue, errorMessage: lastNameError } = useField("lastname");
 const { value: emailValue, errorMessage: emailError } = useField("email");
 const { value: passwordValue, errorMessage: passwordError } = useField("password");
 </script>
@@ -25,21 +29,29 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
   <div class="container">
     <div class="logo"></div>
     <div class="card">
-      <h1 class="card__title">Connexion</h1>
-      <p class="card__subtitle">Tu n'as pas encore de compte ? <router-link to="/signup" class="card__action">Créer un compte</router-link></p>
+      <h1 class="card__title">Inscription</h1>
+      <p class="card__subtitle">Tu as déjà un compte ? <router-link to="/login" class="card__action">Se connecter</router-link></p>
 
-      <form @submit.prevent="submit">
+      <form @submit="submit">
         <div class="form-row">
-          <input @blur="handleBlur" v-model="emailValue" id="email" class="form-row__input" type="text" placeholder="Adresse mail" />
+          <input v-model="emailValue" id="email" class="form-row__input" type="text" placeholder="Adresse mail" />
           <p v-if="emailError" class="form-error">{{ emailError }}</p>
         </div>
         <div class="form-row">
-          <input v-model="passwordValue" id="signupassword" class="form-row__input" type="password" placeholder="Mot de passe" />
+          <div class="form-column">
+            <input v-model="firstNameValue" id="firstname" class="form-row__input" type="text" placeholder="Prénom" />
+            <input v-model="lastNameValue" id="lastname" class="form-row__input" type="text" placeholder="Nom" />
+          </div>
+          <p v-if="firstNameError" class="form-error">{{ firstNameError }}</p>
+          <p v-if="lastNameError" class="form-error">{{ lastNameError }}</p>
+        </div>
+        <div class="form-row">
+          <input v-model="passwordValue" id="password" class="form-row__input" type="password" placeholder="Mot de passe" />
           <p v-if="passwordError" class="form-error">{{ passwordError }}</p>
         </div>
         <div class="form-row">
           <button class="button">
-            <span>Connexion</span>
+            <span>Créer mon compte</span>
           </button>
         </div>
       </form>

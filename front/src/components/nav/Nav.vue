@@ -6,19 +6,15 @@
       <img src="@/assets/images/icon-left-font-monochrome-black.svg" class="logo" alt="" />
       <ul>
         <li>
-          <router-link to=""><i class="fa-fw fa-solid fa-house"></i><span class="menu_text">Accueil</span></router-link>
+          <router-link to="/"><i class="fa-fw fa-solid fa-house"></i><span class="menu_text">Accueil</span></router-link>
         </li>
 
         <li>
-          <router-link><i class="fa-fw fa-solid fa-house"></i><span class="menu_text">Profil</span></router-link>
+          <router-link to="/profil"><i class="fa-fw fa-solid fa-house"></i><span class="menu_text">Profil</span></router-link>
         </li>
 
         <li>
-          <router-link><i class="fa-fw fa-solid fa-house"></i><span class="menu_text">Messages</span></router-link>
-        </li>
-
-        <li>
-          <router-link><i class="fa-fw fa-solid fa-house"></i><span class="menu_text">Paramètres</span></router-link>
+          <router-link to="/params"><i class="fa-fw fa-solid fa-house"></i><span class="menu_text">Paramètres</span></router-link>
         </li>
       </ul>
     </nav>
