@@ -1,4 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
+import { useUser } from "./shared/stores/userStore";
+import { isAuthenticatedGuard, isNotAuthenticatedGuard } from "./shared/guards";
 
 export const router = createRouter({
   history: createWebHistory(),
@@ -6,6 +8,7 @@ export const router = createRouter({
     {
       path: "/",
       component: () => import("@/views/Home.vue"),
+      beforeEnter: [isAuthenticatedGuard],
       children: [
         {
           path: "",
@@ -28,14 +31,23 @@ export const router = createRouter({
     {
       path: "/login",
       component: () => import("@/views/Login.vue"),
+      beforeEnter: [isNotAuthenticatedGuard],
     },
     {
-      path: "/signup",
-      component: () => import("@/views/SignUp.vue"),
+      path: "/signin",
+      component: () => import("@/views/Signin.vue"),
+      beforeEnter: [isNotAuthenticatedGuard],
     },
     {
       path: "/:notfound(.*)*",
       component: () => import("@/views/Notfound.vue"),
     },
   ],
+});
+
+router.beforeEach(async () => {
+  const userStore = useUser();
+  if (!userStore.loaded) {
+    await userStore.fetchCurrentUser();
+  }
 });

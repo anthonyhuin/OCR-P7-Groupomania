@@ -2,20 +2,30 @@
 import { z } from "zod";
 import { toFormValidator } from "@vee-validate/zod";
 import { useField, useForm } from "vee-validate";
+import { useRouter } from "vue-router";
+import { useUser } from "@/shared/stores";
+
+const router = useRouter();
+const userStore = useUser();
 
 const validationSchema = toFormValidator(
   z.object({
     email: z.string({ required_error: "Vous devez renseigner le champ email" }).email("Format email incorrect"),
-    password: z.string({ required_error: "Vous devez renseigner ce champ signuppassword" }).min(5, "Le mot de passe doit faire au moins 5 caractères"),
+    password: z.string({ required_error: "Vous devez renseigner ce champ" }).min(5, "Le mot de passe doit faire au moins 5 caractères"),
   })
 );
 
 const { handleSubmit, setErrors } = useForm({
   validationSchema,
 });
-const { handleBlur } = useField("email");
+
 const submit = handleSubmit(async (formValue) => {
-  console.log(formValue);
+  try {
+    await userStore.login(formValue);
+    router.push("/");
+  } catch (e) {
+    setErrors({ password: e });
+  }
 });
 
 const { value: emailValue, errorMessage: emailError } = useField("email");
@@ -26,11 +36,11 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
     <div class="logo"></div>
     <div class="card">
       <h1 class="card__title">Connexion</h1>
-      <p class="card__subtitle">Tu n'as pas encore de compte ? <router-link to="/signup" class="card__action">Créer un compte</router-link></p>
+      <p class="card__subtitle">Tu n'as pas encore de compte ? <router-link to="/signin" class="card__action">Créer un compte</router-link></p>
 
       <form @submit.prevent="submit">
         <div class="form-row">
-          <input @blur="handleBlur" v-model="emailValue" id="email" class="form-row__input" type="text" placeholder="Adresse mail" />
+          <input v-model="emailValue" id="email" class="form-row__input" type="text" placeholder="Adresse mail" />
           <p v-if="emailError" class="form-error">{{ emailError }}</p>
         </div>
         <div class="form-row">
@@ -130,7 +140,7 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
   flex-direction: row;
   gap: 16px;
 }
-.error-message {
+.form-error {
   color: var(--danger-1);
   font-weight: 500;
 }

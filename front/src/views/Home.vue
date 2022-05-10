@@ -1,11 +1,22 @@
 <script setup>
 import Nav from "../components/nav/Nav.vue";
 import Aside from "../components/aside/Aside.vue";
+
+import { useRouter } from "vue-router";
+import { useUser } from "@/shared/stores";
+
+const userStore = useUser();
+const router = useRouter();
+
+async function logout() {
+  await userStore.logout();
+  router.push("/login");
+}
 </script>
 
 <template>
   <div class="appcontainer">
-    <Nav class="nav" />
+    <Nav class="nav" :isAuthenticated="userStore.isAuthenticated" @logout="logout" />
     <router-view class="content"></router-view>
     <Aside class="aside" />
   </div>

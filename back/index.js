@@ -1,43 +1,26 @@
 const express = require("express");
-const path = require("path");
 require("dotenv").config();
-const mysql = require("mysql2/promise");
-const { Sequelize } = require("sequelize");
-const port = "3000";
-module.exports = db = {};
-
-initialize();
-
-async function initialize() {
-  // create db if don't exist
-  const connection = await mysql.createConnection({
-    host: process.env.HOST,
-    port: process.env.PORT,
-    user: process.env.USER,
-    password: process.env.PASSWORD,
-  });
-  await connection.query(`CREATE DATABASE IF NOT EXISTS \`${process.env.DATA_BASE}\`;`);
-
-  // connect to db
-
-  const sequelize = new Sequelize(process.env.DATA_BASE, process.env.USER, process.env.PASSWORD, {
-    host: process.env.HOST,
-    dialect: "mysql",
-  });
-
-  // init models and add them to the exported db object
-  db.User = require("./user.model")(sequelize);
-
-  // sync all models with database
-  await sequelize.sync();
-}
+const path = require("path");
+const cookieParser = require("cookie-parser");
+const port = "8000";
+const router = require("./routes");
+const cors = require("cors");
+require("./database");
 
 const app = express();
-
-app.use(express.static("../client-build"));
-
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "../client-build/index.html"));
+app.use(function (req, res, next) {
+  res.setHeader("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization");
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, PATCH, DELETE");
+  res.setHeader("Access-Control-Allow-Credentials", true);
+  next();
 });
+app.use(express.static("../client-build"));
+app.use(express.json());
+app.use(cookieParser());
+
+app.use(router);
 
 app.listen(port);
+
+app.use(cors());

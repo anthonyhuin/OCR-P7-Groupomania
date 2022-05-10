@@ -1,7 +1,11 @@
 <script setup>
 import { z } from "zod";
 import { toFormValidator } from "@vee-validate/zod";
-import { useField, useForm } from "vee-validate";
+import { useField, useForm, defineRule } from "vee-validate";
+import { useRouter } from "vue-router";
+import { createUser } from "@/shared/services/user.service";
+
+const router = useRouter();
 
 const validationSchema = toFormValidator(
   z.object({
@@ -18,6 +22,12 @@ const { handleSubmit, setErrors } = useForm({
 
 const submit = handleSubmit(async (formValue) => {
   console.log(formValue);
+  try {
+    await createUser(formValue);
+    router.push("/login");
+  } catch (e) {
+    console.log(e);
+  }
 });
 
 const { value: firstNameValue, errorMessage: firstNameError } = useField("firstname");
@@ -142,7 +152,7 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
   flex-direction: row;
   gap: 16px;
 }
-.error-message {
+.form-error {
   color: var(--danger-1);
   font-weight: 500;
 }
