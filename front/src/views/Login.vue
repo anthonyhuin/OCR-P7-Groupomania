@@ -10,8 +10,12 @@ const userStore = useUser();
 
 const validationSchema = toFormValidator(
   z.object({
-    email: z.string({ required_error: "Vous devez renseigner le champ email" }).email("Format email incorrect"),
-    password: z.string({ required_error: "Vous devez renseigner ce champ" }).min(5, "Le mot de passe doit faire au moins 5 caractères"),
+    email: z.string({ required_error: "Veuillez renseigner ce champ" }).email("Format email incorrect").nonempty().regex(new RegExp(/^\S*$/), "L'email ne doit pas contenir d'espace"),
+    password: z
+      .string({ required_error: "Veuillez renseigner ce champ" })
+      .min(5, "Le mot de passe doit faire au moins 5 caractères")
+      .nonempty()
+      .regex(new RegExp(/^\S*$/), "Le mot de passe ne doit pas contenir d'espace"),
   })
 );
 

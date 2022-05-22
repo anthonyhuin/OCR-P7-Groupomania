@@ -29,7 +29,7 @@ export const useUser = defineStore("user", {
       await logout();
       this.currentUser = null;
     },
-    async fetchCurrentUser() {
+    async CurrentUser() {
       this.currentUser = await fetchCurrentUser();
       this.loaded = true;
     },

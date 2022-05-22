@@ -13,18 +13,22 @@ export const router = createRouter({
         {
           path: "",
           component: () => import("@/components/timeline/Timeline.vue"),
+          beforeEnter: [isAuthenticatedGuard],
         },
         {
           path: "profil",
           component: () => import("@/components/profil/Profil.vue"),
+          beforeEnter: [isAuthenticatedGuard],
         },
         {
-          path: "reply",
-          component: () => import("@/components/reply/Reply.vue"),
+          path: "/comment/:id",
+          component: () => import("@/components/reply/Comment.vue"),
+          beforeEnter: [isAuthenticatedGuard],
         },
         {
           path: "params",
           component: () => import("@/components/params/Params.vue"),
+          beforeEnter: [isAuthenticatedGuard],
         },
       ],
     },
@@ -48,6 +52,6 @@ export const router = createRouter({
 router.beforeEach(async () => {
   const userStore = useUser();
   if (!userStore.loaded) {
-    await userStore.fetchCurrentUser();
+    await userStore.CurrentUser();
   }
 });

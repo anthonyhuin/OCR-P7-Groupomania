@@ -12,32 +12,32 @@
   --gray-1: #dfe6e9;
   --gray-2: #b2bec3;
   --gray-3: #c3cfd4;
+  --gray-4: #9ea5a8;
   --white: #ffffff;
   --background: #edf2f6;
   --background-card: #ffffff;
 
-  --border: solid 1px var(--gray-3);
+  --border: solid 0px var(--gray-3);
   --border-in: solid 1px #e5e5e5;
-  --border-radius: 8px;
+  --border-radius: 2px;
   --box-shadow: 0 1px 2px rgba(82, 82, 82, 0.2);
+  --p-5: 5px;
+  --p-10: 10px;
+  --p-15: 15px;
+  --p-20: 20px;
+
+  --m-5: 5px;
+  --m-10: 10px;
+  --m-15: 15px;
+  --m-20: 20px;
 }
 
 // reset
 * {
   box-sizing: border-box;
-}
-
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
   margin: 0;
-}
-
-p {
-  margin: 0;
+  line-height: 140%;
+  padding: 0;
 }
 
 ul {
@@ -75,4 +75,7 @@ body {
   padding: 4px 11px;
   transition: 0.4s background-color;
   cursor: pointer;
+}
+.router-link-exact-active {
+  color: var(--primary-2) !important;
 }

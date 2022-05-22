@@ -1,7 +1,15 @@
-<script setup></script>
+<script setup>
+import Event from "./Event.vue";
+import Suggest from "./Suggest.vue";
+import Footer from "./Footer.vue";
+</script>
 
 <template>
-  <h1>aside</h1>
+  <aside>
+    <Event />
+    <Suggest />
+    <Footer />
+  </aside>
 </template>
 
-<style scoped></style>
+<style type="scss" scoped></style>

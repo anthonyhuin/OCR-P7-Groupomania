@@ -9,10 +9,14 @@ const router = useRouter();
 
 const validationSchema = toFormValidator(
   z.object({
-    firstname: z.string({ required_error: "Vous devez renseigner ce champ firstname" }).min(2, "Trop court"),
-    lastname: z.string({ required_error: "Vous devez renseigner ce champ lastname" }).min(2, "Trop court"),
-    email: z.string({ required_error: "Vous devez renseigner le champ email" }).email("Format email incorrect"),
-    password: z.string({ required_error: "Vous devez renseigner ce champ signuppassword" }).min(5, "Le mot de passe doit faire au moins 5 caractères"),
+    firstname: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty().regex(new RegExp(/^\S*$/), "Le prénom ne doit pas contenir d'espace"),
+    lastname: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty().regex(new RegExp(/^\S*$/), "Le nom ne doit pas contenir d'espace"),
+    email: z.string({ required_error: "Veuillez renseigner ce champ" }).email("Format email incorrect").nonempty().regex(new RegExp(/^\S*$/), "L'email ne doit pas contenir d'espace"),
+    password: z
+      .string({ required_error: "Veuillez renseigner ce champ" })
+      .min(5, "Le mot de passe doit faire au moins 5 caractères")
+      .nonempty()
+      .regex(new RegExp(/^\S*$/), "Le mot de passe ne doit pas contenir d'espace"),
   })
 );
 
@@ -21,12 +25,11 @@ const { handleSubmit, setErrors } = useForm({
 });
 
 const submit = handleSubmit(async (formValue) => {
-  console.log(formValue);
   try {
     await createUser(formValue);
     router.push("/login");
   } catch (e) {
-    console.log(e);
+    setErrors({ password: e });
   }
 });
 

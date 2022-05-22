@@ -16,13 +16,15 @@ async function logout() {
 
 <template>
   <div class="appcontainer">
-    <Nav class="nav" :isAuthenticated="userStore.isAuthenticated" @logout="logout" />
+    <Nav class="nav" @logout="logout" />
     <router-view class="content"></router-view>
     <Aside class="aside" />
   </div>
 </template>
 
-<style scoped lang="scss">
+<style lang="scss">
+@import "@/assets/style/base.scss";
+
 .appcontainer {
   position: relative;
   padding: 0 20px 0 20px;
@@ -38,7 +40,7 @@ async function logout() {
   position: sticky;
   top: 0;
   padding: 10px;
-  height: 70vh;
+  height: 60vh;
   align-self: start;
   display: flex;
   flex-direction: column;
@@ -47,7 +49,7 @@ async function logout() {
   box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
   border: var(--border);
-  min-height: 500px;
+  min-height: 300px;
 }
 .content {
   border-radius: var(--border-radius);
@@ -61,5 +63,55 @@ async function logout() {
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.profil_pic {
+  height: 40px;
+  width: 40px;
+  overflow: hidden;
+  border-radius: 50%;
+
+  flex-shrink: 0;
+  margin: 0;
+}
+@media only screen and (max-width: 700px) {
+  .nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    top: unset !important;
+    width: 100%;
+    height: 50px;
+    border-radius: unset;
+    width: 100%;
+    min-height: 50px;
+  }
+  .appcontainer {
+    grid-template-columns: 1fr;
+  }
+  .aside {
+    display: none;
+    visibility: hidden;
+  }
+  .reponsiveLogo {
+    width: 100%;
+    max-height: 30px;
+    margin-top: 10px;
+    background-color: var(--background);
+  }
+  .appcontainer {
+    margin: 10px auto;
+  }
+}
+@media only screen and (min-width: 700px) {
+  .reponsiveLogo {
+    display: none;
+  }
+}
+@media only screen and (min-width: 700px) and (max-width: 992px) {
+  .appcontainer {
+    grid-template-columns: 60px 1fr 0.4fr;
+  }
 }
 </style>

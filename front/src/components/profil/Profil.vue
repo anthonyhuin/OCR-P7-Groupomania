@@ -9,7 +9,7 @@ const emit = defineEmits(["logout"]);
 <template>
   <span>
     <h1>profil</h1>
-    <pre>{{ userStore.currentUser }}</pre>
+    <pre>{{ userStore.currentUser.first_name }}</pre>
 
     <span v-if="isAuthenticated">Connecté</span>
     <span v-else-if="isAuthenticated === false">Pas connecté</span></span
