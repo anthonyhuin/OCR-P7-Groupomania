@@ -8,9 +8,10 @@ import axios from "axios";
 import { usePost, useUser } from "@/shared/stores";
 import { ref } from "vue";
 import Textarea from "../textarea.vue";
+import "animate.css";
 const postStore = usePost();
 const userStore = useUser();
-
+let inputParams = ref([]);
 function setLike(postId, index) {
   postStore.posts[index].hasLiked = !postStore.posts[index].hasLiked;
 
@@ -32,10 +33,11 @@ function deletePost(postId, index) {
   axios
     .delete(`/api/post/${postId}`)
     .then((response) => {
-      postStore.posts[index].errorMessage = "Post supprimé";
       setTimeout(() => {
+        postStore.posts[index].errorMessage = "Post supprimé";
+
         postStore.posts.splice(index, 1);
-      }, 3000);
+      }, 500);
     })
     .catch((error) => {
       postStore.posts[index].errorMessage = error.response.data.error;
@@ -71,33 +73,33 @@ function formatTime(time) {
   return moment(time, "YYYY-MM-DD hh-mm-ss").subtract(-2, "hours").fromNow();
 }
 
-function createComment(postId, comment) {
-  const body = {
-    postId: postId,
-    comment: comment,
-  };
-  console.log(body);
-  // axios
-  //   .post("/api/comment", body)
-  //   .then((response) => {
-  //     postStore.posts[2].comments.splice(0, 0, response.data);
-  //     console.log(response.data);
-  //   })
-  //   .catch((error) => {
-  //     setErrors({ post: error.response.data.error });
-  //   });
+function createComment(postId, comment, index) {
+  const body = { comment: comment };
+  axios
+    .post(`/api/comment/${postId}`, body)
+    .then((response) => {
+      let indexOf = postStore.posts.findIndex((object) => {
+        return object.id == postId;
+      });
+      postStore.posts[indexOf].comments.splice(0, 0, response.data);
+    })
+    .catch((error) => {
+      console.log({ erreur: error });
+    });
 }
 </script>
 
 <template>
-  <div class="card" v-for="(post, index) in postStore.posts">
+  <div class="card animate__animated" v-for="(post, index) in postStore.posts" :class="{ animate__zoomOut: postStore.posts[index].clickDelete }">
     <div class="card_header">
       <div class="header_pp"><img :src="post.profilePicture" class="fake_pp" /></div>
       <div class="header_info">
         <span class="header_pseudo">{{ post.firstName + " " + post.lastName }}</span>
         <span class="header_time">{{ formatTime(post.createdAt) }} <i class="fa-regular fa-clock"></i></span>
       </div>
-      <div class="header_edit" v-if="userStore.currentUser.id === post.userId" @click="deletePost(post.id, index)"><i class="fa-solid fa-ellipsis"></i></div>
+      <div class="header_edit" v-if="userStore.currentUser.id === post.userId" @click="deletePost(post.id, index), (postStore.posts[index].clickDelete = true)">
+        <i class="fa-solid fa-ellipsis"></i>
+      </div>
     </div>
     <div class="card_body">
       <p>
@@ -106,7 +108,7 @@ function createComment(postId, comment) {
     </div>
     <div class="card_stats">
       <div class="stats_like" :class="{ liked: post.hasLiked }" @click="setLike(post.id, index)"><i class="fa-regular fa-thumbs-up"></i> J'aime ({{ post.likeCount }})</div>
-      <div class="stats_comment"><i class="fa-regular fa-comment"></i> Commenter ({{ post.commentCount }})</div>
+      <div class="stats_comment"><i class="fa-regular fa-comment"></i> Commenter ({{ postStore.posts[index].comments.length }})</div>
     </div>
 
     <div v-for="(comment, key) in post.comments" class="card_comment">
@@ -115,7 +117,7 @@ function createComment(postId, comment) {
         <div class="comment_bulle">
           <div class="comment_pseudo">
             <p>{{ comment.firstName + " " + comment.lastName }}</p>
-            <div class="comment_edit" @click="deleteComment(comment.id, index, key)"><i class="fa-solid fa-ellipsis"></i></div>
+            <div class="comment_edit" v-if="userStore.currentUser.id === comment.userId" @click="deleteComment(comment.id, index, key)"><i class="fa-solid fa-ellipsis"></i></div>
           </div>
           <p class="comment_text">{{ comment.comment }}</p>
           <span class="comment_time">{{ formatTime(comment.createdAt) }} <i class="fa-regular fa-clock"></i></span>
@@ -123,9 +125,9 @@ function createComment(postId, comment) {
       </div>
     </div>
     <div class="card_form">
-      <div class="form_pp"><img src="https://avatars.dicebear.com/api/adventurer-neutral/An45454555555555ny.svg" class="fake_pp_comment" /></div>
-      <form @submit.prevent="" class="card_form_input">
-        <textarea v-model="" name="text" id="commentaire" :placeholder="'Répondre à ' + post.firstName"></textarea>
+      <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="fake_pp_comment" /></div>
+      <form @submit.prevent="createComment(post.id, this.inputParams[index], index), (this.inputParams[index] = '')" class="card_form_input">
+        <textarea v-model="inputParams[index]" name="text" id="commentaire" :placeholder="'Répondre à ' + post.firstName"></textarea>
 
         <button class="card_btn btn"><i class="fa-regular fa-comments"></i></button>
       </form>
@@ -134,6 +136,13 @@ function createComment(postId, comment) {
 </template>
 
 <style scoped>
+:root {
+  --animate-duration: 800ms;
+  --animate-delay: 0.8s;
+}
+.byebye {
+  background-color: #131313 !important;
+}
 .card_form {
   display: flex;
   flex: 1 1 auto;
@@ -215,6 +224,7 @@ textarea {
   border-radius: 2px;
   margin-top: 16px;
   box-shadow: var(--box-shadow);
+  transition: 0.5s ease-out;
 }
 /*//////////////////////////////////////////////////////////*/
 .card_header {
@@ -241,6 +251,10 @@ textarea {
 }
 .header_edit {
   padding: 10px;
+  cursor: pointer;
+}
+.header_edit:hover {
+  color: var(--danger-1);
 }
 /*/ /////////////////////////////////////////////////////////*/
 
@@ -328,6 +342,10 @@ textarea {
   display: flex;
   justify-content: center;
   align-items: center;
+  cursor: pointer;
+}
+.comment_edit:hover {
+  color: var(--danger-1);
 }
 .fa-clock {
   font-size: 0.6rem;

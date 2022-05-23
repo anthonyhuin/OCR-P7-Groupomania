@@ -16,7 +16,7 @@ exports.createPost = async (req, res) => {
   try {
     const post = await Post.create(data);
     const user = await User.findOne({ attributes: ["firstName", "lastName", "profilePicture"], where: { id: req.user.id } });
-    data = { ...post.dataValues, ...user.dataValues, like: 0 };
+    data = { ...post.dataValues, ...user.dataValues, likeCount: 0, commentCount: 0, errorMessage: "", hasLiked: false, clickDelete: false, comments: [] };
 
     res.status(201).json(data);
   } catch (error) {
@@ -62,9 +62,11 @@ exports.getAllPosts = async (req, res) => {
           errorMessage: "",
           hasLiked: hasLiked,
           comments: commentWithInfo,
+          clickDelete: false,
         };
       })
     );
+    console.log(postWithInfo);
     res.status(201).json(postWithInfo);
   } catch (e) {
     console.log(e);

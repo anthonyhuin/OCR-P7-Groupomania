@@ -10,10 +10,10 @@ import { ref } from "vue";
 const userStore = useUser();
 const postStore = usePost();
 const router = useRouter();
-
+let clean = ref("");
 const validationSchema = toFormValidator(
   z.object({
-    post: z.string({ required_error: "Veuillez renseigner ce champ" }).min(5, "Le post doit faire au moins 5 caractères").max(500, "Le post doit faire moins de 200 caractères"),
+    post: z.string({ required_error: "Veuillez renseigner ce champ" }).max(500, "Le post doit faire moins de 200 caractères"),
   })
 );
 
@@ -40,10 +40,10 @@ const { value: postValue, errorMessage: postError } = useField("post");
 <template>
   <div class="form_main">
     <h2>Accueil</h2>
-    <form @submit="submit">
+    <form @submit.prevent="submit">
       <div class="form_container">
         <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="profil_pic" alt="" /></div>
-        <textarea v-model.lazy="postValue" id="post" placeholder="Quoi de neuf ?"></textarea>
+        <textarea v-model.lazy="postValue" ref="clean" id="post" placeholder="Quoi de neuf ?"></textarea>
       </div>
 
       <div class="form-button">
