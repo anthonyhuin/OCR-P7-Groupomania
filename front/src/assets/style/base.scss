@@ -68,6 +68,7 @@ body {
   }
   background: var(--primary-1);
   font-family: var(--font-family);
+  font-size: 1rem;
   color: var(--white);
   border-radius: 8px;
   font-weight: 500;
@@ -78,4 +79,16 @@ body {
 }
 .router-link-exact-active {
   color: var(--primary-2) !important;
+}
+textarea {
+  border: none;
+  resize: none;
+  background-color: #f3f3f3;
+  width: 100%;
+  flex-grow: 3;
+  font-family: inherit;
+  font-size: 0.9rem;
+  padding: 5px;
+  border-radius: 3px;
+  height: 100%;
 }

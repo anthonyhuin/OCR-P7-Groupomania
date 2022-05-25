@@ -29,10 +29,10 @@ async function logout() {
   position: relative;
   padding: 0 20px 0 20px;
   min-height: 100vh;
-  max-width: 1040px;
+  max-width: 1100px;
   margin: 20px auto;
   display: grid;
-  grid-template-columns: 0.4fr 1fr 0.4fr;
+  grid-template-columns: 0.4fr 1fr 0.5fr;
   grid-gap: 16px;
 }
 
@@ -52,10 +52,7 @@ async function logout() {
   min-height: 300px;
   transition: 0.4s linear;
 }
-.content {
-  border-radius: var(--border-radius);
-  border-top: 5px solid var(--color-primary);
-}
+
 .aside {
   position: sticky;
   top: 0;

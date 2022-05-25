@@ -14,6 +14,7 @@ const authApi = require("./routes/auth.api");
 const postApi = require("./routes/post.api");
 const likeApi = require("./routes/like.api");
 const commentApi = require("./routes/comment.api");
+const profiltApi = require("./routes/profil.api");
 
 app.use(express.static("../client-build"));
 
@@ -25,6 +26,7 @@ app.use("/api/auth", authApi);
 app.use("/api/post", postApi);
 app.use("/api/like", likeApi);
 app.use("/api/comment", commentApi);
+app.use("/api/profil", profiltApi);
 
 app.listen(8000, () => console.log("server up and running"));
 

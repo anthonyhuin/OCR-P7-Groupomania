@@ -13,7 +13,7 @@ const emit = defineEmits(["logout"]);
           <router-link to="/" class="menu_link"><i class="fa-fw fa-solid fa-house"></i><span class="menu_text">Accueil</span> </router-link>
         </li>
         <li>
-          <router-link to="/profil" class="menu_link"><i class="fa-fw fa-solid fa-user"></i><span class="menu_text">Profil</span></router-link>
+          <router-link :to="'/profil/' + userStore.currentUser.id" class="menu_link"><i class="fa-fw fa-solid fa-user"></i><span class="menu_text">Profil</span></router-link>
         </li>
 
         <li>
@@ -54,7 +54,7 @@ li a {
 }
 @media only screen and (max-width: 900px) {
   .menu_text {
-    font-size: 0.8rem;
+    font-size: 1rem;
   }
   .fa-solid {
     margin-right: 10px;

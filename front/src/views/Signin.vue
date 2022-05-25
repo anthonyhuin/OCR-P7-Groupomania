@@ -132,7 +132,7 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
   color: white;
   border-radius: 8px;
   font-weight: 800;
-  font-size: 15px;
+  font-size: 1rem;
   border: none;
   width: 100%;
   padding: 16px;
@@ -165,7 +165,7 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
   border-radius: 8px;
   background: #f3f3f3;
   font-weight: 500;
-  font-size: 16px;
+  font-size: 1rem;
   flex: 1;
   min-width: 100px;
   color: black;

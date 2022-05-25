@@ -5,7 +5,7 @@
 <style type="scss" scoped>
 footer {
   color: var(--text);
-  font-size: 0.7rem;
+  font-size: 0.9rem;
   text-align: center;
 }
 </style>

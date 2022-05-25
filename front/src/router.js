@@ -16,13 +16,8 @@ export const router = createRouter({
           beforeEnter: [isAuthenticatedGuard],
         },
         {
-          path: "profil",
+          path: "profil/:id",
           component: () => import("@/components/profil/Profil.vue"),
-          beforeEnter: [isAuthenticatedGuard],
-        },
-        {
-          path: "/comment/:id",
-          component: () => import("@/components/reply/Comment.vue"),
           beforeEnter: [isAuthenticatedGuard],
         },
         {

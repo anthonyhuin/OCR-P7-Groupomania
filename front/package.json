@@ -8,6 +8,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "@kyvg/vue3-notification": "^2.3.4",
     "@vee-validate/zod": "^4.5.11",
     "animate.css": "^4.1.1",
     "axios": "^0.27.2",

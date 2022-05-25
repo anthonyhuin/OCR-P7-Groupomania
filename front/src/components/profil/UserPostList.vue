@@ -5,27 +5,29 @@ import { useField, useForm } from "vee-validate";
 import moment from "moment";
 import "moment/dist/locale/fr";
 import axios from "axios";
-import { usePost, useUser } from "@/shared/stores";
+import { useProfil, useUser } from "@/shared/stores";
 import { ref } from "vue";
+import { useRoute } from "vue-router";
 import Textarea from "../textarea.vue";
 import "animate.css";
-import { notify } from "@kyvg/vue3-notification";
-const postStore = usePost();
+const profilStore = useProfil();
 const userStore = useUser();
+const route = useRoute();
 let inputParams = ref([]);
 function setLike(postId, index) {
-  postStore.posts[index].hasLiked = !postStore.posts[index].hasLiked;
+  profilStore.posts[index].hasLiked = !profilStore.posts[index].hasLiked;
 
   axios
     .post("/api/like", {
       postId: postId,
     })
+
     .then((response) => {
       console.log(response.data);
-      postStore.posts[index].likeCount = response.data.count;
+      profilStore.posts[index].likeCount = response.data.count;
     })
     .catch((error) => {
-      notification(error.response.data.error, "error");
+      errorMessage.value = error.response.data.error;
     });
 }
 
@@ -33,35 +35,38 @@ function deletePost(postId, index) {
   axios
     .delete(`/api/post/${postId}`)
     .then((response) => {
-      notification("Post supprimé", "info");
-      postStore.posts.splice(index, 1);
+      setTimeout(() => {
+        profilStore.posts[index].errorMessage = "Post supprimé";
+
+        profilStore.posts.splice(index, 1);
+      }, 500);
     })
     .catch((error) => {
-      notification(error.response.data.error, "error");
+      profilStore.posts[index].errorMessage = error.response.data.error;
     });
 }
 function deleteComment(commentId, indexPost, indexComment) {
   axios
     .delete(`/api/comment/${commentId}`)
     .then((response) => {
-      notification("Commentaire supprimé", "info");
-      postStore.posts[indexPost].comments.splice(indexComment, 1);
+      profilStore.posts[indexPost].errorMessage = "Commentaire supprimé";
+      profilStore.posts[indexPost].comments.splice(indexComment, 1);
     })
     .catch((error) => {
-      notification(error.response.data.error, "error");
+      profilStore.posts[index].errorMessage = error.response.data.error;
     });
 }
 function getAllPosts() {
   axios
-    .get("/api/post")
+    .get(`/api/profil/post/${route.params.id}`)
     .then(function (response) {
-      postStore.posts = response.data;
+      profilStore.posts = response.data;
     })
     .catch(function (error) {
       console.log(error);
     })
     .then(function () {
-      postStore.isloading = false;
+      profilStore.isloading = false;
     });
 }
 getAllPosts();
@@ -75,67 +80,61 @@ function createComment(postId, comment, index) {
   axios
     .post(`/api/comment/${postId}`, body)
     .then((response) => {
-      let indexOf = postStore.posts.findIndex((object) => {
+      let indexOf = profilStore.posts.findIndex((object) => {
         return object.id == postId;
       });
-      postStore.posts[indexOf].comments.splice(0, 0, response.data);
+      profilStore.posts[indexOf].comments.splice(0, 0, response.data);
     })
     .catch((error) => {
       console.log({ erreur: error });
     });
 }
-
-function notification(title, type, duration) {
-  notify({
-    duration: duration ? duration : 3000,
-    type: type ? type : "info",
-    title: title,
-  });
-}
 </script>
 
 <template>
-  <div class="card animate__animated" v-for="(post, index) in postStore.posts" :class="{ animate__zoomOut: postStore.posts[index].clickDelete }">
-    <div class="card_header">
-      <div class="header_pp"><img :src="post.profilePicture" class="fake_pp" /></div>
-      <div class="header_info">
-        <span class="header_pseudo">{{ post.firstName + " " + post.lastName }}</span>
-        <span class="header_time">{{ formatTime(post.createdAt) }} <i class="fa-regular fa-clock"></i></span>
-      </div>
-      <div class="header_edit" v-if="userStore.currentUser.id === post.userId" @click="deletePost(post.id, index), (postStore.posts[index].clickDelete = true)">
-        <i class="fa-solid fa-ellipsis"></i>
-      </div>
-    </div>
-    <div class="card_body">
-      <p>
-        {{ post.post }}
-      </p>
-    </div>
-    <div class="card_stats">
-      <div class="stats_like" :class="{ liked: post.hasLiked }" @click="setLike(post.id, index)"><i class="fa-regular fa-thumbs-up"></i> J'aime ({{ post.likeCount }})</div>
-      <div class="stats_comment"><i class="fa-regular fa-comment"></i> Commenter ({{ postStore.posts[index].comments.length }})</div>
-    </div>
-
-    <div v-for="(comment, key) in post.comments" class="card_comment">
-      <div class="comment_container">
-        <div class="comment_pp"><img :src="comment.profilePicture" class="fake_pp_comment" /></div>
-        <div class="comment_bulle">
-          <div class="comment_pseudo">
-            <p>{{ comment.firstName + " " + comment.lastName }}</p>
-            <div class="comment_edit" v-if="userStore.currentUser.id === comment.userId" @click="deleteComment(comment.id, index, key)"><i class="fa-solid fa-ellipsis"></i></div>
-          </div>
-          <p class="comment_text">{{ comment.comment }}</p>
-          <span class="comment_time">{{ formatTime(comment.createdAt) }} <i class="fa-regular fa-clock"></i></span>
+  <div class="container">
+    <div class="card animate__animated" v-for="(post, index) in profilStore.posts" :class="{ animate__zoomOut: profilStore.posts[index].clickDelete }">
+      <div class="card_header">
+        <div class="header_pp"><img :src="post.profilePicture" class="fake_pp" /></div>
+        <div class="header_info">
+          <span class="header_pseudo">{{ post.firstName + " " + post.lastName }}</span>
+          <span class="header_time">{{ formatTime(post.createdAt) }} <i class="fa-regular fa-clock"></i></span>
+        </div>
+        <div class="header_edit" v-if="userStore.currentUser.id === post.userId" @click="deletePost(post.id, index), (profilStore.posts[index].clickDelete = true)">
+          <i class="fa-solid fa-ellipsis"></i>
         </div>
       </div>
-    </div>
-    <div class="card_form">
-      <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="fake_pp_comment" /></div>
-      <form @submit.prevent="createComment(post.id, this.inputParams[index], index), (this.inputParams[index] = '')" class="card_form_input">
-        <textarea v-model="inputParams[index]" name="text" id="commentaire" :placeholder="'Répondre à ' + post.firstName"></textarea>
+      <div class="card_body">
+        <p>
+          {{ post.post }}
+        </p>
+      </div>
+      <div class="card_stats">
+        <div class="stats_like" :class="{ liked: post.hasLiked }" @click="setLike(post.id, index)"><i class="fa-regular fa-thumbs-up"></i> J'aime ({{ post.likeCount }})</div>
+        <div class="stats_comment"><i class="fa-regular fa-comment"></i> Commenter ({{ profilStore.posts[index].comments.length }})</div>
+      </div>
 
-        <button class="card_btn btn"><i class="fa-regular fa-comments"></i></button>
-      </form>
+      <div v-for="(comment, key) in post.comments" class="card_comment">
+        <div class="comment_container">
+          <div class="comment_pp"><img :src="comment.profilePicture" class="fake_pp_comment" /></div>
+          <div class="comment_bulle">
+            <div class="comment_pseudo">
+              <p>{{ comment.firstName + " " + comment.lastName }}</p>
+              <div class="comment_edit" v-if="userStore.currentUser.id === comment.userId" @click="deleteComment(comment.id, index, key)"><i class="fa-solid fa-ellipsis"></i></div>
+            </div>
+            <p class="comment_text">{{ comment.comment }}</p>
+            <span class="comment_time">{{ formatTime(comment.createdAt) }} <i class="fa-regular fa-clock"></i></span>
+          </div>
+        </div>
+      </div>
+      <div class="card_form">
+        <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="fake_pp_comment" /></div>
+        <form @submit.prevent="createComment(post.id, this.inputParams[index], index), (this.inputParams[index] = '')" class="card_form_input">
+          <textarea v-model="inputParams[index]" name="text" id="commentaire" :placeholder="'Répondre à ' + post.firstName"></textarea>
+
+          <button class="card_btn btn"><i class="fa-regular fa-comments"></i></button>
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -160,17 +159,7 @@ function notification(title, type, duration) {
 form {
   display: flex;
 }
-textarea {
-  border: none;
-  resize: none;
-  background-color: #f3f3f3;
-  width: 100%;
-  flex-grow: 3;
-  font-family: inherit;
-  padding: 5px;
-  border-radius: 3px;
-  height: 100%;
-}
+
 .card_btn {
   margin: 0px 0 0px 10px;
 }

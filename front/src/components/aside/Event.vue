@@ -30,7 +30,7 @@ h4 {
   font-weight: 600;
 }
 p {
-  font-size: 0.8rem;
+  font-size: 1rem;
   font-weight: 400;
 }
 </style>
