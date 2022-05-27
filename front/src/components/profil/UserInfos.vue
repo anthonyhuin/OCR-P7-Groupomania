@@ -4,46 +4,82 @@ import { usePost, useUser } from "@/shared/stores";
 import EditProfil from "./EditProfil.vue";
 import { useRoute } from "vue-router";
 import { ref } from "vue";
+import moment from "moment";
+import "moment/dist/locale/fr";
 const postStore = usePost();
 const userStore = useUser();
 const route = useRoute();
 
 let editProfil = ref(false);
+let infoProfil = ref([]);
 
 function getInfoProfil() {
   axios
     .get(`/api/profil/${route.params.id}`)
     .then(function (response) {
-      postStore.posts = response.data;
+      infoProfil.value = response.data;
+      console.log(response.data);
     })
     .catch(function (error) {
       console.log(error);
     })
-    .then(function () {
-      postStore.isloading = false;
-    });
+    .then(function () {});
+}
+getInfoProfil();
+function formatTime(time, method) {
+  if (method) {
+    return moment(time).format("L");
+  } else {
+    return moment(time, "YYYY-MM-DD hh-mm-ss").fromNow();
+  }
 }
 </script>
 
 <template>
-  <EditProfil v-if="editProfil" @close="editProfil = !editProfil" />
-  <div class="containter">
-    <div class="card">
-      <div class="card_background">
-        <img src="@/assets/images/casey-horner-rtCujH697DU-unsplash (1).jpg" alt="" class="background_img" />
-        <div @click="editProfil = !editProfil" class="btn">Éditer le profil</div>
-      </div>
+  <div v-if="userStore.currentUser.id == route.params.id">
+    <EditProfil v-if="editProfil" @close="editProfil = !editProfil" />
+    <div class="containter">
+      <div class="card">
+        <div class="card_background">
+          <img src="@/assets/images/casey-horner-rtCujH697DU-unsplash (1).jpg" alt="" class="background_img" />
+          <div @click="editProfil = !editProfil" class="btn">Éditer le profil</div>
+        </div>
 
-      <div class="header_img">
-        <img :src="userStore.currentUser.profilePicture" class="card_pp" /><span class="body_pseudo">{{ userStore.currentUser.firstName + " " + userStore.currentUser.lastName }}</span>
-      </div>
+        <div class="header_img">
+          <img :src="userStore.currentUser.profilePicture" class="card_pp" /><span class="body_pseudo">{{ userStore.currentUser.firstName + " " + userStore.currentUser.lastName }}</span>
+          <span class="header_post">{{ userStore.currentUser.poste }}</span>
+        </div>
 
-      <div class="card_body">
-        <p class="body_bio">Lorem ipsum dolor sit amet consectetur adipisicing elit. Optio voluptas magnam corporis esse aliquam provident ipsum cumque iure magni animi!</p>
-        <span class="body_createdAt"><i class="fa-solid fa-cake-candles"></i> Anniversaire le 21 septembre</span>
-        <span class="body_birthday"><i class="fa-solid fa-calendar-days"></i> A rejoint Groupomania en mai 2022</span>
+        <div class="card_body">
+          <p class="body_bio" v-if="userStore.currentUser.bio">{{ userStore.currentUser.bio }}</p>
+          <span class="body_createdAt"><i class="fa-solid fa-cake-candles"></i> {{ formatTime(userStore.currentUser.birthdate, "birthdate") }}</span>
+          <span class="body_birthday"><i class="fa-solid fa-calendar-days"></i> A rejoint Groupomania {{ formatTime(userStore.currentUser.createdAt) }} </span>
+          <span class="body_birthday"><i class="fa-solid fa-location-dot"></i> {{ userStore.currentUser.location }}</span>
+        </div>
+        <div class="card_footer"></div>
       </div>
-      <div class="card_footer"></div>
+    </div>
+  </div>
+  <div v-else>
+    <div class="containter">
+      <div class="card">
+        <div class="card_background">
+          <img src="@/assets/images/casey-horner-rtCujH697DU-unsplash (1).jpg" alt="" class="background_img" />
+        </div>
+
+        <div class="header_img">
+          <img :src="infoProfil.profilePicture" class="card_pp" /><span class="body_pseudo">{{ infoProfil.firstName + " " + infoProfil.lastName }}</span>
+          <span class="header_post">{{ infoProfil.poste }}</span>
+        </div>
+
+        <div class="card_body">
+          <p class="body_bio" v-if="infoProfil.bio">{{ infoProfil.bio }}</p>
+          <span class="body_createdAt" v-if="infoProfil.birthday"><i class="fa-solid fa-cake-candles"></i> {{ formatTime(infoProfil.birthday, "birthdate") }}</span>
+          <span class="body_birthday"><i class="fa-solid fa-calendar-days"></i> A rejoint Groupomania {{ formatTime(infoProfil.createdAt) }} </span>
+          <span class="body_birthday" v-if="infoProfil.location"><i class="fa-solid fa-location-dot"></i> {{ infoProfil.location }}</span>
+        </div>
+        <div class="card_footer"></div>
+      </div>
     </div>
   </div>
 </template>
@@ -87,9 +123,16 @@ function getInfoProfil() {
   z-index: 2;
   margin-bottom: 15px;
 }
+.header_post{
+
+ font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--gray-3);
+}
 .card_pp {
+box-shadow: 0 0 0px 0 white inset, 0 0 3px 0 white;
   max-height: 115px;
-  border: 4px solid #2196f3;
+
   border-radius: 50%;
   max-width: 115px;
 }

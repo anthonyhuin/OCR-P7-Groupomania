@@ -1,7 +1,7 @@
 <script setup>
 import { useUser } from "@/shared/stores";
-const userStore = useUser();
 const emit = defineEmits(["logout"]);
+const userStore = useUser();
 </script>
 
 <template>
@@ -47,11 +47,9 @@ li a {
   padding: 10px;
   transition: 0.3s;
   border-radius: 10px;
-  color: black;
+  color: var(--text-color);
 }
-.menu_text {
-  font-size: 1rem;
-}
+
 @media only screen and (max-width: 900px) {
   .menu_text {
     font-size: 1rem;
@@ -99,6 +97,9 @@ li a:hover {
   cursor: pointer;
 }
 @media only screen and (max-width: 700px) {
+  .nav {
+    border-top: var(--border-in);
+  }
   nav {
     display: flex;
     flex-direction: row;
@@ -117,7 +118,7 @@ li a:hover {
 
     align-items: center;
     margin: 0;
-    flex: 3 0 auto;
+    flex: 1 1 auto;
     justify-content: space-evenly;
   }
   li {
@@ -126,6 +127,15 @@ li a:hover {
   }
   .menu_text {
     display: none;
+  }
+  .fa-solid {
+    margin-right: 0px;
+    font-size: 1.6rem;
+  }
+  .menu_link {
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }
 @media only screen and (min-width: 700px) and (max-width: 992px) {

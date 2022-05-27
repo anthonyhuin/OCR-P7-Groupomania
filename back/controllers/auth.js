@@ -6,7 +6,7 @@ const { key } = require("../keys");
 
 exports.login = async (req, res) => {
   const body = req.body;
-  const user = await User.findOne({ where: { email: body.email } });
+  const user = await User.findOne({ raw: true, where: { email: body.email } });
 
   if (user === null) {
     res.status(400).json("Mauvais email ou mot de passe");
@@ -24,6 +24,8 @@ exports.login = async (req, res) => {
         }
       );
       res.cookie("token", token);
+      delete user.password;
+      console.log(user);
       res.json(user);
     } else {
       res.status(400).json("Mauvais email ou mot de passe");

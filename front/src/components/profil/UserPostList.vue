@@ -9,6 +9,7 @@ import { useProfil, useUser } from "@/shared/stores";
 import { ref } from "vue";
 import { useRoute } from "vue-router";
 import Textarea from "../textarea.vue";
+import { notify } from "@kyvg/vue3-notification";
 import "animate.css";
 const profilStore = useProfil();
 const userStore = useUser();
@@ -27,7 +28,7 @@ function setLike(postId, index) {
       profilStore.posts[index].likeCount = response.data.count;
     })
     .catch((error) => {
-      errorMessage.value = error.response.data.error;
+      notification(error.response.data.error, "error");
     });
 }
 
@@ -35,11 +36,9 @@ function deletePost(postId, index) {
   axios
     .delete(`/api/post/${postId}`)
     .then((response) => {
-      setTimeout(() => {
-        profilStore.posts[index].errorMessage = "Post supprimé";
+      notification("Post supprimé", "info");
 
-        profilStore.posts.splice(index, 1);
-      }, 500);
+      profilStore.posts.splice(index, 1);
     })
     .catch((error) => {
       profilStore.posts[index].errorMessage = error.response.data.error;
@@ -49,11 +48,11 @@ function deleteComment(commentId, indexPost, indexComment) {
   axios
     .delete(`/api/comment/${commentId}`)
     .then((response) => {
-      profilStore.posts[indexPost].errorMessage = "Commentaire supprimé";
+      notification("Commentaire supprimé", "info");
       profilStore.posts[indexPost].comments.splice(indexComment, 1);
     })
     .catch((error) => {
-      profilStore.posts[index].errorMessage = error.response.data.error;
+      notification(error.response.data.error, "error");
     });
 }
 function getAllPosts() {
@@ -86,8 +85,16 @@ function createComment(postId, comment, index) {
       profilStore.posts[indexOf].comments.splice(0, 0, response.data);
     })
     .catch((error) => {
-      console.log({ erreur: error });
+      notification(error.response.data.error, "error");
     });
+}
+
+function notification(title, type, duration) {
+  notify({
+    duration: duration ? duration : 3000,
+    type: type ? type : "info",
+    title: title,
+  });
 }
 </script>
 

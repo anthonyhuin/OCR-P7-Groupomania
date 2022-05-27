@@ -73,8 +73,6 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
 </template>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;800&display=swap");
-
 * {
   font-family: var(--font-family);
   margin: 0;
@@ -124,7 +122,7 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
   font-weight: 500;
 }
 .card__action {
-  color: #4f9ae6;
+  color: var(--primary-1);
   cursor: pointer;
 }
 .button {

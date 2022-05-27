@@ -66,5 +66,6 @@ h2 {
 h3 {
   font-size: 1rem;
   font-weight: 500;
+  margin-bottom: 3px;
 }
 </style>

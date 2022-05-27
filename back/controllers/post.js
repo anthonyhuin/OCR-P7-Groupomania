@@ -59,10 +59,8 @@ exports.getAllPosts = async (req, res) => {
           profilePicture: userInfos.profilePicture,
           likeCount: likeCount,
           commentCount: commentCount,
-          errorMessage: "",
           hasLiked: hasLiked,
           comments: commentWithInfo,
-          clickDelete: false,
         };
       })
     );

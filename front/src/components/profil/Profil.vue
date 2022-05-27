@@ -9,15 +9,10 @@ const emit = defineEmits(["logout"]);
 </script>
 
 <template>
-  <div class="userpostlist">
+  <div>
     <UserInfos />
     <UserPostList />
   </div>
 </template>
 
-<style scoped>
-.userpostlist {
-  display: flex;
-  flex-direction: column;
-}
-</style>
+<style scoped></style>

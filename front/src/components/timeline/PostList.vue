@@ -40,6 +40,7 @@ function deletePost(postId, index) {
       notification(error.response.data.error, "error");
     });
 }
+
 function deleteComment(commentId, indexPost, indexComment) {
   axios
     .delete(`/api/comment/${commentId}`)
@@ -51,6 +52,7 @@ function deleteComment(commentId, indexPost, indexComment) {
       notification(error.response.data.error, "error");
     });
 }
+
 function getAllPosts() {
   axios
     .get("/api/post")
@@ -81,7 +83,7 @@ function createComment(postId, comment, index) {
       postStore.posts[indexOf].comments.splice(0, 0, response.data);
     })
     .catch((error) => {
-      console.log({ erreur: error });
+      notification(error.response.data.error, "error");
     });
 }
 
@@ -99,7 +101,9 @@ function notification(title, type, duration) {
     <div class="card_header">
       <div class="header_pp"><img :src="post.profilePicture" class="fake_pp" /></div>
       <div class="header_info">
-        <span class="header_pseudo">{{ post.firstName + " " + post.lastName }}</span>
+        <router-link :to="'/profil/' + post.userId" class="menu_link"
+          ><span class="header_pseudo">{{ post.firstName + " " + post.lastName }}</span></router-link
+        >
         <span class="header_time">{{ formatTime(post.createdAt) }} <i class="fa-regular fa-clock"></i></span>
       </div>
       <div class="header_edit" v-if="userStore.currentUser.id === post.userId" @click="deletePost(post.id, index), (postStore.posts[index].clickDelete = true)">
@@ -121,7 +125,7 @@ function notification(title, type, duration) {
         <div class="comment_pp"><img :src="comment.profilePicture" class="fake_pp_comment" /></div>
         <div class="comment_bulle">
           <div class="comment_pseudo">
-            <p>{{ comment.firstName + " " + comment.lastName }}</p>
+            <router-link :to="'/profil/' + comment.userId" class="menu_link">{{ comment.firstName + " " + comment.lastName }}</router-link>
             <div class="comment_edit" v-if="userStore.currentUser.id === comment.userId" @click="deleteComment(comment.id, index, key)"><i class="fa-solid fa-ellipsis"></i></div>
           </div>
           <p class="comment_text">{{ comment.comment }}</p>
@@ -139,7 +143,6 @@ function notification(title, type, duration) {
     </div>
   </div>
 </template>
-
 <style scoped>
 :root {
   --animate-duration: 800ms;
@@ -160,17 +163,7 @@ function notification(title, type, duration) {
 form {
   display: flex;
 }
-textarea {
-  border: none;
-  resize: none;
-  background-color: #f3f3f3;
-  width: 100%;
-  flex-grow: 3;
-  font-family: inherit;
-  padding: 5px;
-  border-radius: 3px;
-  height: 100%;
-}
+
 .card_btn {
   margin: 0px 0 0px 10px;
 }

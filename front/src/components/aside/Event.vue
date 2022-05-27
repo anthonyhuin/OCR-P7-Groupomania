@@ -20,6 +20,7 @@
   border: var(--border);
   box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
+  overflow: hidden;
 }
 .background {
   position: absolute;

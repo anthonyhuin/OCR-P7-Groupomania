@@ -20,6 +20,12 @@ module.exports = (sequelize, DataTypes) => {
       bio: {
         type: DataTypes.TEXT,
       },
+      poste: {
+        type: DataTypes.STRING,
+      },
+      location: {
+        type: DataTypes.STRING,
+      },
       profilePicture: {
         type: DataTypes.STRING,
       },

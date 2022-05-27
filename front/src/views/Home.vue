@@ -1,17 +1,16 @@
 <script setup>
 import Nav from "../components/nav/Nav.vue";
 import Aside from "../components/aside/Aside.vue";
-
 import { useRouter } from "vue-router";
 import { useUser } from "@/shared/stores";
-
-const userStore = useUser();
-const router = useRouter();
 
 async function logout() {
   await userStore.logout();
   router.push("/login");
 }
+
+const userStore = useUser();
+const router = useRouter();
 </script>
 
 <template>
@@ -23,8 +22,6 @@ async function logout() {
 </template>
 
 <style lang="scss">
-@import "@/assets/style/base.scss";
-
 .appcontainer {
   position: relative;
   padding: 0 20px 0 20px;
@@ -57,7 +54,7 @@ async function logout() {
   position: sticky;
   top: 0;
   align-self: start;
-  height: 70vh;
+
   display: flex;
   flex-direction: column;
   gap: 16px;
@@ -80,10 +77,11 @@ async function logout() {
     right: 0;
     top: unset !important;
     width: 100%;
-    height: 50px;
+    height: 60px;
     border-radius: unset;
     width: 100%;
-    min-height: 50px;
+    min-height: 60px;
+    flex-direction: row !important;
   }
   .appcontainer {
     grid-template-columns: 1fr;

@@ -63,17 +63,7 @@ const { value: postValue, errorMessage: postError } = useField("post");
   font-weight: 600;
   font-size: 0.8rem;
 }
-textarea {
-  border: none;
-  resize: none;
-  background-color: #f3f3f3;
-  width: 100%;
-  flex-grow: 3;
-  font-family: inherit;
-  padding: 5px;
-  border-radius: 3px;
-  height: 100%;
-}
+
 h2 {
   font-size: 1rem;
   font-weight: 600;
@@ -112,7 +102,7 @@ form {
   border-top: 5px solid var(--primary-1);
 }
 .form_main h2 {
-  color: var(--title);
+  color: var(--text-color);
 }
 .form_container {
   display: flex;

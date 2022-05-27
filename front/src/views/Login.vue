@@ -4,6 +4,7 @@ import { toFormValidator } from "@vee-validate/zod";
 import { useField, useForm } from "vee-validate";
 import { useRouter } from "vue-router";
 import { useUser } from "@/shared/stores";
+import { notify } from "@kyvg/vue3-notification";
 
 const router = useRouter();
 const userStore = useUser();
@@ -26,6 +27,10 @@ const { handleSubmit, setErrors } = useForm({
 const submit = handleSubmit(async (formValue) => {
   try {
     await userStore.login(formValue);
+    notify({
+      type: "success",
+      title: "Connecté",
+    });
     router.push("/");
   } catch (e) {
     setErrors({ password: e });
@@ -62,8 +67,6 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
 </template>
 
 <style scoped>
-@import url("https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;800&display=swap");
-
 * {
   font-family: var(--font-family);
   margin: 0;
@@ -113,7 +116,7 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
   font-weight: 500;
 }
 .card__action {
-  color: #4f9ae6;
+  color: var(--primary-1);
   cursor: pointer;
 }
 .button {
