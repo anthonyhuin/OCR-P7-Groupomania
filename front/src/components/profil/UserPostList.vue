@@ -6,7 +6,7 @@ import moment from "moment";
 import "moment/dist/locale/fr";
 import axios from "axios";
 import { useProfil, useUser } from "@/shared/stores";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import Textarea from "../textarea.vue";
 import { notify } from "@kyvg/vue3-notification";
@@ -69,6 +69,12 @@ function getAllPosts() {
     });
 }
 getAllPosts();
+watch(
+  () => route.params.id,
+  () => {
+    getAllPosts();
+  }
+);
 
 function formatTime(time) {
   return moment(time, "YYYY-MM-DD hh-mm-ss").subtract(-2, "hours").fromNow();
@@ -104,7 +110,10 @@ function notification(title, type, duration) {
       <div class="card_header">
         <div class="header_pp"><img :src="post.profilePicture" class="fake_pp" /></div>
         <div class="header_info">
-          <span class="header_pseudo">{{ post.firstName + " " + post.lastName }}</span>
+          <router-link :to="'/profil/' + post.userId" class="menu_link"
+            ><span class="header_pseudo">{{ post.firstName + " " + post.lastName }}</span></router-link
+          >
+
           <span class="header_time">{{ formatTime(post.createdAt) }} <i class="fa-regular fa-clock"></i></span>
         </div>
         <div class="header_edit" v-if="userStore.currentUser.id === post.userId" @click="deletePost(post.id, index), (profilStore.posts[index].clickDelete = true)">
@@ -126,7 +135,7 @@ function notification(title, type, duration) {
           <div class="comment_pp"><img :src="comment.profilePicture" class="fake_pp_comment" /></div>
           <div class="comment_bulle">
             <div class="comment_pseudo">
-              <p>{{ comment.firstName + " " + comment.lastName }}</p>
+              <router-link :to="'/profil/' + comment.userId" class="menu_link">{{ comment.firstName + " " + comment.lastName }}</router-link>
               <div class="comment_edit" v-if="userStore.currentUser.id === comment.userId" @click="deleteComment(comment.id, index, key)"><i class="fa-solid fa-ellipsis"></i></div>
             </div>
             <p class="comment_text">{{ comment.comment }}</p>

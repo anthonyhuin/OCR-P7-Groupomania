@@ -31,6 +31,9 @@ const userStore = useUser();
 </template>
 
 <style type="scss" scoped>
+.router-link-exact-active {
+  color: var(--primary-1) !important;
+}
 nav {
   display: flex;
   flex-direction: column;

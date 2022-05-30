@@ -16,7 +16,7 @@ const likeApi = require("./routes/like.api");
 const commentApi = require("./routes/comment.api");
 const profiltApi = require("./routes/profil.api");
 
-app.use(express.static("../client-build"));
+app.use("/images", express.static(__dirname + "/Images"));
 
 app.use(express.json());
 app.use(cookieParser());

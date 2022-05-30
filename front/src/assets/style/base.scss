@@ -15,7 +15,7 @@
   --gray-3: #5a5655;
   --gray-4: #9ea5a8;
   --white: #ffffff;
-  --background: #edf2f6;
+  --background: #000; //#edf2f6
   --background-card: #ffffff;
 
   --border: solid 0px #ffd7d7;
@@ -78,9 +78,7 @@ body {
   transition: 0.4s background-color;
   cursor: pointer;
 }
-.router-link-exact-active {
-  color: var(--primary-1) !important;
-}
+
 textarea {
   border: none;
   resize: none;
@@ -94,6 +92,6 @@ textarea {
   border-radius: 3px;
   height: 100%;
 }
-::placeholder {
+textarea::placeholder {
   color: var(--text-color);
 }

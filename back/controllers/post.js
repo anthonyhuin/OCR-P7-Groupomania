@@ -3,24 +3,37 @@ const Post = db.post;
 const User = db.user;
 const Like = db.like;
 const Comment = db.comment;
-const { Op } = require("sequelize");
-const { comment } = require("../database/index");
+const fs = require("fs");
+const { promisify } = require("util");
+const pipeline = promisify(require("stream").pipeline);
+const { uploadErrors } = require("../middleware/error");
 
 exports.createPost = async (req, res) => {
+  let fileName;
+  if (req.file !== undefined) {
+    const MIME_TYPES = {
+      "image/jpg": "jpg",
+      "image/jpeg": "jpeg",
+      "image/png": "png",
+    };
+    console.log(req.file);
+    fileName = req.file.originalname.split(" ").join("_").split(".").join("_") + Date.now() + "." + MIME_TYPES[req.file.mimetype];
+  }
+
   let data = {
     userId: req.user.id,
     post: req.body.post,
-    picture: req.body.picture,
+    picture: req.file !== undefined ? "./uploads/posts/" + fileName : null,
   };
 
   try {
     const post = await Post.create(data);
     const user = await User.findOne({ attributes: ["firstName", "lastName", "profilePicture"], where: { id: req.user.id } });
-    data = { ...post.dataValues, ...user.dataValues, likeCount: 0, commentCount: 0, errorMessage: "", hasLiked: false, clickDelete: false, comments: [] };
+    data = { ...post.dataValues, ...user.dataValues, likeCount: 0, commentCount: 0, hasLiked: false, comments: [] };
 
     res.status(201).json(data);
   } catch (error) {
-    res.status(400).json({ error });
+    res.status(400).json(error);
   }
 };
 

@@ -3,7 +3,7 @@ import axios from "axios";
 import { usePost, useUser } from "@/shared/stores";
 import EditProfil from "./EditProfil.vue";
 import { useRoute } from "vue-router";
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import moment from "moment";
 import "moment/dist/locale/fr";
 const postStore = usePost();
@@ -13,12 +13,20 @@ const route = useRoute();
 let editProfil = ref(false);
 let infoProfil = ref([]);
 
+console.log(route.params.id);
+
+watch(
+  () => route.params.id,
+  () => {
+    getInfoProfil();
+  }
+);
+
 function getInfoProfil() {
   axios
     .get(`/api/profil/${route.params.id}`)
     .then(function (response) {
       infoProfil.value = response.data;
-      console.log(response.data);
     })
     .catch(function (error) {
       console.log(error);
@@ -26,8 +34,9 @@ function getInfoProfil() {
     .then(function () {});
 }
 getInfoProfil();
+
 function formatTime(time, method) {
-  if (method) {
+  if (method == "birthdate") {
     return moment(time).format("L");
   } else {
     return moment(time, "YYYY-MM-DD hh-mm-ss").fromNow();
