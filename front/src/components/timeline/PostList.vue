@@ -114,6 +114,7 @@ function notification(title, type, duration) {
       <p>
         {{ post.post }}
       </p>
+      <img v-if="post.picture !== null" :src="post.picture" class="picture_post" />
     </div>
     <div class="card_stats">
       <div class="stats_like" :class="{ liked: post.hasLiked }" @click="setLike(post.id, index)"><i class="fa-regular fa-thumbs-up"></i> J'aime ({{ post.likeCount }})</div>
@@ -143,13 +144,16 @@ function notification(title, type, duration) {
     </div>
   </div>
 </template>
-<style scoped>
+<style lang="scss" scoped>
 :root {
   --animate-duration: 800ms;
   --animate-delay: 0.8s;
 }
-.byebye {
-  background-color: #131313 !important;
+.picture_post {
+  width: 100%;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  max-width: 100%;
 }
 .card_form {
   display: flex;
@@ -257,8 +261,11 @@ form {
 /*/ /////////////////////////////////////////////////////////*/
 
 .card_body {
-  margin: 10px 0 10px 0;
+  margin: 10px -10px 10px -10px;
   font-size: 1rem;
+  p {
+    margin: 0 10px 10px 10px;
+  }
 }
 /*//////////////////////////////////////////////////////////*/
 

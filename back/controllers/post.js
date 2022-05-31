@@ -4,9 +4,6 @@ const User = db.user;
 const Like = db.like;
 const Comment = db.comment;
 const fs = require("fs");
-const { promisify } = require("util");
-const pipeline = promisify(require("stream").pipeline);
-const { uploadErrors } = require("../middleware/error");
 
 exports.createPost = async (req, res) => {
   let fileName;
@@ -16,21 +13,19 @@ exports.createPost = async (req, res) => {
       "image/jpeg": "jpeg",
       "image/png": "png",
     };
-    console.log(req.file);
-    fileName = req.file.originalname.split(" ").join("_").split(".").join("_") + Date.now() + "." + MIME_TYPES[req.file.mimetype];
   }
 
   let data = {
     userId: req.user.id,
     post: req.body.post,
-    picture: req.file !== undefined ? "./uploads/posts/" + fileName : null,
+    picture: req.file !== undefined ? `${req.protocol}://${req.get("host")}/posts/${req.file.filename}` : null,
   };
 
   try {
     const post = await Post.create(data);
     const user = await User.findOne({ attributes: ["firstName", "lastName", "profilePicture"], where: { id: req.user.id } });
     data = { ...post.dataValues, ...user.dataValues, likeCount: 0, commentCount: 0, hasLiked: false, comments: [] };
-
+    console.log(data);
     res.status(201).json(data);
   } catch (error) {
     res.status(400).json(error);
@@ -86,17 +81,28 @@ exports.getAllPosts = async (req, res) => {
 
 exports.deletePost = async (req, res) => {
   try {
-    const post = await Post.findOne({ attributes: ["userId"], where: { id: req.params.id } });
-
+    const post = await Post.findOne({ where: { id: req.params.id } });
+    console.log(post.dataValues.picture);
     if (req.user.id !== post.dataValues.userId) {
       return res.status(400).send({
-        error: "Action non autorisée",
+        erreur: "Action non autorisée",
       });
-    }
+    } else {
+      if (post.dataValues.picture != null) {
+        const filename = post.dataValues.picture.split("/posts/")[1];
+        console.log(filename);
 
-    await Post.destroy({ where: { id: req.params.id } });
-    //supprimer aussi les commentaires lié au post
-    return res.status(200).send("message supprimé");
+        fs.unlink(`uploads/posts/${filename}`, async () => {
+          await Post.destroy({ where: { id: req.params.id } });
+          //supprimer aussi les commentaires lié au post
+          return res.status(200).send("message supprimé");
+        });
+      } else {
+        await Post.destroy({ where: { id: req.params.id } });
+        //supprimer aussi les commentaires lié au post
+        return res.status(200).send("message supprimé");
+      }
+    }
   } catch (error) {
     return res.status(401).send(error);
   }

@@ -62,27 +62,23 @@ exports.getInfoProfil = async (req, res) => {
 };
 
 exports.modifyProfil = async (req, res) => {
-  if (req.params.id !== req.user.id) {
-    res.status(403).send("Action non autorisé");
-  } else {
-    try {
-      let user = await User.findOne({ where: { id: req.user.id } });
+  try {
+    let user = await User.findOne({ where: { id: req.user.id } });
 
-      user.set({
-        bio: req.body.bio,
-        birthdate: req.body.birthday,
-        firstName: req.body.firstname,
-        lastName: req.body.lastname,
-        location: req.body.location,
-        poste: req.body.poste,
-      });
+    user.set({
+      bio: req.body.bio,
+      birthdate: req.body.birthday,
+      firstName: req.body.firstname,
+      lastName: req.body.lastname,
+      location: req.body.location,
+      poste: req.body.poste,
+    });
 
-      user = await user.save();
+    user = await user.save();
 
-      res.status(201).json(user);
-    } catch (e) {
-      console.log(e);
-      res.status(403).json({ erreur: e });
-    }
+    res.status(201).json(user);
+  } catch (e) {
+    console.log(e);
+    res.status(403).json({ erreur: e });
   }
 };

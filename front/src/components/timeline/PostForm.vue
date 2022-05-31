@@ -17,20 +17,32 @@ const validationSchema = toFormValidator(
   })
 );
 
+let imagePost = ref({});
+
+function onChange(e) {
+  console.log(typeof e.target.files[0]);
+  return (imagePost = e.target.files[0]);
+}
+
 const { handleSubmit, setErrors } = useForm({
   validationSchema,
 });
 
 const submit = handleSubmit((formValue) => {
-  formValue["picture"] = null;
-
+  formValue["picture"] = imagePost;
+  console.log(formValue);
   axios
-    .post("/api/post", formValue)
+    .post("/api/post", formValue, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    })
     .then((response) => {
+      console.log(response);
       postStore.posts.splice(0, 0, response.data);
     })
     .catch((error) => {
-      setErrors({ post: error.response.data.error });
+      setErrors({ post: error.response.data.erreur });
     });
 });
 
@@ -40,14 +52,19 @@ const { value: postValue, errorMessage: postError } = useField("post");
 <template>
   <div class="form_main">
     <h2>Accueil</h2>
-    <form @submit.prevent="submit">
+    <form @submit.prevent="submit" enctype="multipart/form-data">
       <div class="form_container">
         <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="profil_pic" alt="" /></div>
         <textarea v-model.lazy="postValue" ref="clean" id="post" placeholder="Quoi de neuf ?"></textarea>
       </div>
 
       <div class="form-button">
-        <div class="icon_form"><i class="fa-solid fa-image"></i><i class="fa-solid fa-face-grin-wide"></i></div>
+        <div class="icon_form">
+          <input @change="onChange" type="file" name="picture" id="picture" class="inputfile" />
+          <label for="picture"><i class="fa-solid fa-image"></i></label>
+
+          <i class="fa-solid fa-face-grin-wide"></i>
+        </div>
         <p v-if="postError" class="form-error">{{ postError }}</p>
         <button class="btn">
           <span>Publier</span>
@@ -58,6 +75,18 @@ const { value: postValue, errorMessage: postError } = useField("post");
 </template>
 
 <style lang="scss" scoped>
+.inputfile {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+.inputfile + label {
+  cursor: pointer; /* "hand" cursor */
+}
+
 .form-error {
   color: var(--danger-1);
   font-weight: 600;

@@ -27,15 +27,15 @@ const upload = multer({
     callback(null, true);
   },
   limits: { fileSize: 1000000 }, // 1000000 bytes = 1 Mo
-}).single("file");
+}).single("picture");
 
 module.exports = async (req, res, next) => {
   upload(req, res, function (err) {
     if (err instanceof multer.MulterError) {
-      if (err.message.includes("File too large")) return res.status(500).json({ erreur: "L'image est trop volumineuse" });
+      if (err.message.includes("File too large")) return res.status(500).json({ erreur: "Le fichier dépasse 1mo" });
       return res.status(500).json(err);
     } else if (err) {
-      if (err.message.includes("Format incorrect")) return res.status(500).json({ erreur: "Format de fichier incorrect" });
+      if (err.message.includes("Format incorrect")) return res.status(500).json({ erreur: "Format de fichier incompatabile" });
       return res.status(500).json(err);
     }
 
