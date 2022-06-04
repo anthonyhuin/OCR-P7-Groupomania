@@ -102,6 +102,30 @@ function notification(title, type, duration) {
     title: title,
   });
 }
+
+function editPost(postId, postContent) {
+  let data = {
+    post: postContent,
+  };
+  axios
+    .patch(`/api/post/${postId}`, data)
+    .then((response) => {
+      console.log(response.data);
+
+      notify({
+        type: "success",
+        title: "Post modifié",
+      });
+    })
+    .catch((error) => {
+      notify({
+        type: "error",
+        title: error.response.data.erreur,
+      });
+    });
+}
+
+//v-if="userStore.currentUser.id === post.userId" @click="deletePost(post.id, index), (profilStore.posts[index].clickDelete = true)">
 </script>
 
 <template>
@@ -124,6 +148,7 @@ function notification(title, type, duration) {
         <p>
           {{ post.post }}
         </p>
+        <img v-if="post.picture !== null" :src="post.picture" class="picture_post" />
       </div>
       <div class="card_stats">
         <div class="stats_like" :class="{ liked: post.hasLiked }" @click="setLike(post.id, index)"><i class="fa-regular fa-thumbs-up"></i> J'aime ({{ post.likeCount }})</div>
@@ -155,7 +180,7 @@ function notification(title, type, duration) {
   </div>
 </template>
 
-<style scoped>
+<style lang="scss" scoped>
 :root {
   --animate-duration: 800ms;
   --animate-delay: 0.8s;
@@ -269,8 +294,11 @@ form {
 /*/ /////////////////////////////////////////////////////////*/
 
 .card_body {
-  margin: 10px 0 10px 0;
+  margin: 10px -10px 10px -10px;
   font-size: 1rem;
+  p {
+    margin: 0 10px 10px 10px;
+  }
 }
 /*//////////////////////////////////////////////////////////*/
 

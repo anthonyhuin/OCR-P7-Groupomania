@@ -1,7 +1,9 @@
-<script setup></script>
+<script setup>
+import DeleteAccount from "./DeleteAccount.vue";
+</script>
 
 <template>
-  <h1>params</h1>
+  <DeleteAccount />
 </template>
 
 <style scoped></style>

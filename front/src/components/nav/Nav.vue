@@ -23,9 +23,7 @@ const userStore = useUser();
     </nav>
     <div class="menu_account">
       <img :src="userStore.currentUser.profilePicture" class="profil_pic profil_pseudo" alt="" />
-      <span @click="emit('logout')" class="pseudo"
-        ><span class="pseudo_pseudo">{{ userStore.currentUser.firstName + " " + userStore.currentUser.lastName }}</span> <i class="logout fa-solid fa-arrow-right-from-bracket"></i
-      ></span>
+      <span @click="emit('logout')" class="pseudo"><span class="pseudo_pseudo">Déconnexion</span> <i class="logout fa-solid fa-arrow-right-from-bracket"></i></span>
     </div>
   </aside>
 </template>
@@ -76,7 +74,7 @@ li a:hover {
 .menu_account {
   display: flex;
   align-items: center;
-  justify-content: space-around;
+  justify-content: space-evenly;
   border-top: var(--border-in);
   padding-top: 10px;
 }

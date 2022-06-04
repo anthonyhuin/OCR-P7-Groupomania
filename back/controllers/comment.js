@@ -18,7 +18,7 @@ exports.createComment = async (req, res) => {
 
     res.status(201).json(data);
   } catch (error) {
-    res.status(400).json({ error });
+    res.status(400).json({ erreur: error });
   }
 };
 

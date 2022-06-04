@@ -1,18 +1,18 @@
 <script setup>
-import { z } from "zod";
-import { toFormValidator } from "@vee-validate/zod";
-import { useField, useForm } from "vee-validate";
 import moment from "moment";
 import "moment/dist/locale/fr";
 import axios from "axios";
 import { usePost, useUser } from "@/shared/stores";
 import { ref } from "vue";
-import Textarea from "../textarea.vue";
 import "animate.css";
 import { notify } from "@kyvg/vue3-notification";
+import EditPost from "./EditPost.vue";
+
 const postStore = usePost();
 const userStore = useUser();
 let inputParams = ref([]);
+let inputEditPost = ref([]);
+let showEditMenu = ref(false);
 function setLike(postId, index) {
   postStore.posts[index].hasLiked = !postStore.posts[index].hasLiked;
 
@@ -21,7 +21,6 @@ function setLike(postId, index) {
       postId: postId,
     })
     .then((response) => {
-      console.log(response.data);
       postStore.posts[index].likeCount = response.data.count;
     })
     .catch((error) => {
@@ -33,7 +32,7 @@ function deletePost(postId, index) {
   axios
     .delete(`/api/post/${postId}`)
     .then((response) => {
-      notification("Post supprimé", "info");
+      notification("Post supprimé", "success");
       postStore.posts.splice(index, 1);
     })
     .catch((error) => {
@@ -45,7 +44,7 @@ function deleteComment(commentId, indexPost, indexComment) {
   axios
     .delete(`/api/comment/${commentId}`)
     .then((response) => {
-      notification("Commentaire supprimé", "info");
+      notification("Commentaire supprimé", "success");
       postStore.posts[indexPost].comments.splice(indexComment, 1);
     })
     .catch((error) => {
@@ -60,7 +59,7 @@ function getAllPosts() {
       postStore.posts = response.data;
     })
     .catch(function (error) {
-      console.log(error);
+      notification(error.response.data.error, "error");
     })
     .then(function () {
       postStore.isloading = false;
@@ -81,9 +80,11 @@ function createComment(postId, comment, index) {
         return object.id == postId;
       });
       postStore.posts[indexOf].comments.splice(0, 0, response.data);
+      console.log(inputParams.value[index]);
+      inputParams = "";
     })
     .catch((error) => {
-      notification(error.response.data.error, "error");
+      notification(error, "error");
     });
 }
 
@@ -106,16 +107,27 @@ function notification(title, type, duration) {
         >
         <span class="header_time">{{ formatTime(post.createdAt) }} <i class="fa-regular fa-clock"></i></span>
       </div>
-      <div class="header_edit" v-if="userStore.currentUser.id === post.userId" @click="deletePost(post.id, index), (postStore.posts[index].clickDelete = true)">
+      <div class="header_edit" v-if="userStore.currentUser.id === post.userId" @click="postStore.posts[index].editMode = !postStore.posts[index].editMode">
         <i class="fa-solid fa-ellipsis"></i>
+
+        <div class="comment_edit_container" v-if="postStore.posts[index].editMode" v-click-outside="() => (postStore.posts[index].editMode = false)">
+          <span class="edit_delete" @click="deletePost(post.id, index), (postStore.posts[index].clickDelete = true), (postStore.posts[index].editMode = !postStore.posts[index].editMode)"
+            ><i class="fa-solid fa-trash-can"></i> Supprimer</span
+          >
+          <span @click="postStore.posts[index].editPost = true"><i class="fa-solid fa-pen-to-square"></i> Editer</span>
+          <span @click="postStore.posts[index].editMode = false"><i class="fa-solid fa-flag"></i> Signaler</span>
+        </div>
       </div>
     </div>
     <div class="card_body">
+      <EditPost v-if="postStore.posts[index].editPost" :post-id="post.id" :post="post.post" :index="index" />
+
       <p>
         {{ post.post }}
       </p>
       <img v-if="post.picture !== null" :src="post.picture" class="picture_post" />
     </div>
+
     <div class="card_stats">
       <div class="stats_like" :class="{ liked: post.hasLiked }" @click="setLike(post.id, index)"><i class="fa-regular fa-thumbs-up"></i> J'aime ({{ post.likeCount }})</div>
       <div class="stats_comment"><i class="fa-regular fa-comment"></i> Commenter ({{ postStore.posts[index].comments.length }})</div>
@@ -136,8 +148,9 @@ function notification(title, type, duration) {
     </div>
     <div class="card_form">
       <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="fake_pp_comment" /></div>
-      <form @submit.prevent="createComment(post.id, this.inputParams[index], index), (this.inputParams[index] = '')" class="card_form_input">
-        <textarea v-model="inputParams[index]" name="text" id="commentaire" :placeholder="'Répondre à ' + post.firstName"></textarea>
+      <form @submit.prevent="createComment(post.id, this.inputParams[index], index), (this.inputParams[index] = null)" class="card_form_input">
+        <resize-textarea :placeholder="'Répondre à ' + post.firstName" name="text" id="commentaire" :minHeight="30" :rows="1" :cols="4" :maxHeight="200" v-model="inputParams[index]">
+        </resize-textarea>
 
         <button class="card_btn btn"><i class="fa-regular fa-comments"></i></button>
       </form>
@@ -146,9 +159,53 @@ function notification(title, type, duration) {
 </template>
 <style lang="scss" scoped>
 :root {
-  --animate-duration: 800ms;
-  --animate-delay: 0.8s;
+  --animate-duration: 500ms;
+  --animate-delay: 0.5s;
 }
+.edit_post_form {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin: 0 10px;
+  textarea {
+    background-color: var(--background-card);
+    font-size: 1rem;
+    border: #131313 1px solid;
+  }
+}
+.comment_edit_container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-color: var(--background-card);
+  border-radius: 5px;
+  padding: 0 10px;
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+
+  min-width: 130px;
+  box-shadow: rgb(101 119 134 / 20%) 0px 0px 15px, rgb(101 119 134 / 15%) 0px 0px 3px 1px;
+
+  span {
+    color: var(--text-color);
+    padding: 10px 0;
+    i {
+      margin-right: 5px;
+    }
+    &:hover {
+      color: #131313;
+    }
+  }
+}
+.edit_delete {
+  color: var(--danger-1) !important;
+  &:hover {
+    color: var(--danger-2) !important;
+  }
+}
+
 .picture_post {
   width: 100%;
   margin-left: 50%;
@@ -159,7 +216,7 @@ function notification(title, type, duration) {
   display: flex;
   flex: 1 1 auto;
   margin-top: 10px;
-  height: 30px;
+  min-height: 30px;
 }
 .card_form_input {
   flex: 1 1 auto;
@@ -254,6 +311,7 @@ form {
 .header_edit {
   padding: 10px;
   cursor: pointer;
+  position: relative;
 }
 .header_edit:hover {
   color: var(--danger-1);

@@ -78,7 +78,6 @@ exports.modifyProfil = async (req, res) => {
 
     res.status(201).json(user);
   } catch (e) {
-    console.log(e);
     res.status(403).json({ erreur: e });
   }
 };

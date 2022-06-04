@@ -13,7 +13,9 @@ const route = useRoute();
 let editProfil = ref(false);
 let infoProfil = ref([]);
 
-console.log(route.params.id);
+if (route.params.id == "") {
+  route.params.id = userStore.currentUser.id;
+}
 
 watch(
   () => route.params.id,
@@ -95,7 +97,7 @@ function formatTime(time, method) {
 
 <style scoped>
 .card {
-  background-color: rgb(255, 255, 255);
+  background-color: var(--background-card);
   display: flex;
   flex-direction: column;
   padding: 10px;

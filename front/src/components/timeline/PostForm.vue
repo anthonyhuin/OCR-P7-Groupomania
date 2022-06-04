@@ -6,22 +6,37 @@ import { useRouter } from "vue-router";
 import { createPost } from "@/shared/services/post.service";
 import { useUser, usePost } from "@/shared/stores";
 import axios from "axios";
-import { ref } from "vue";
+import { onMounted, ref } from "vue";
 const userStore = useUser();
 const postStore = usePost();
 const router = useRouter();
 let clean = ref("");
+let imagePost = ref(null);
+let imagePreview = ref(null);
+let inputfile = ref(null);
+
 const validationSchema = toFormValidator(
   z.object({
-    post: z.string({ required_error: "Veuillez renseigner ce champ" }).max(500, "Le post doit faire moins de 200 caractères"),
+    post: z.string({ required_error: "Veuillez renseigner ce champ" }).max(500, "Le post doit faire moins de 500 caractères"),
   })
 );
 
-let imagePost = ref({});
-
 function onChange(e) {
-  console.log(typeof e.target.files[0]);
-  return (imagePost = e.target.files[0]);
+  const regexImage = new RegExp("(image)[\/](gif|jpg|jpeg|tiff|png)");
+  imagePost = e.target.files[0];
+
+  if (regexImage.test(imagePost.type)) {
+    imagePreview.value = URL.createObjectURL(imagePost);
+    setErrors({ post: "" });
+  } else {
+    imagePost.value = null;
+    setErrors({ post: "format incorect" });
+  }
+}
+
+function resetImageInput() {
+  imagePost = null;
+  imagePreview.value = "";
 }
 
 const { handleSubmit, setErrors } = useForm({
@@ -30,7 +45,7 @@ const { handleSubmit, setErrors } = useForm({
 
 const submit = handleSubmit((formValue) => {
   formValue["picture"] = imagePost;
-  console.log(formValue);
+
   axios
     .post("/api/post", formValue, {
       headers: {
@@ -38,8 +53,10 @@ const submit = handleSubmit((formValue) => {
       },
     })
     .then((response) => {
-      console.log(response);
       postStore.posts.splice(0, 0, response.data);
+      postValue.value = "";
+      imagePost = null;
+      imagePreview.value = "";
     })
     .catch((error) => {
       setErrors({ post: error.response.data.erreur });
@@ -51,16 +68,16 @@ const { value: postValue, errorMessage: postError } = useField("post");
 
 <template>
   <div class="form_main">
-    <h2>Accueil</h2>
+    <h2 @click="test">Accueil</h2>
     <form @submit.prevent="submit" enctype="multipart/form-data">
       <div class="form_container">
         <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="profil_pic" alt="" /></div>
-        <textarea v-model.lazy="postValue" ref="clean" id="post" placeholder="Quoi de neuf ?"></textarea>
+        <resize-textarea name="post" ref="clean" id="post" placeholder="Quoi de neuf ?" :rows="2" :cols="4" :maxHeight="500" v-model="postValue"> </resize-textarea>
       </div>
 
       <div class="form-button">
         <div class="icon_form">
-          <input @change="onChange" type="file" name="picture" id="picture" class="inputfile" />
+          <input @change="onChange" type="file" name="picture" id="picture" class="inputfile" ref="inputfile" accept="image/png, image/jpeg, image/jpg, image/gif" />
           <label for="picture"><i class="fa-solid fa-image"></i></label>
 
           <i class="fa-solid fa-face-grin-wide"></i>
@@ -70,11 +87,46 @@ const { value: postValue, errorMessage: postError } = useField("post");
           <span>Publier</span>
         </button>
       </div>
+      <div v-if="imagePreview" class="form_preview">
+        <span @click="resetImageInput" class="preview_reset"><i class="fa-solid fa-xmark"></i></span>
+        <img :src="imagePreview" class="preview_image" />
+      </div>
     </form>
   </div>
 </template>
 
 <style lang="scss" scoped>
+.form_preview {
+  position: relative;
+
+  .preview_reset {
+    position: absolute;
+    top: 0;
+    left: 0;
+    backdrop-filter: blur(4px);
+    background-color: rgba(15, 20, 25, 0.75);
+    color: rgb(255, 255, 255);
+    margin: 10px;
+    border-radius: 50%;
+    cursor: pointer;
+    height: 25px;
+    width: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: 0.3s;
+    &:hover {
+      background-color: rgba(122, 122, 122, 0.75);
+    }
+  }
+  .preview_image {
+    border-radius: 20px;
+    width: 100%;
+    max-height: 400px;
+    object-fit: cover;
+  }
+}
+
 .inputfile {
   width: 0.1px;
   height: 0.1px;

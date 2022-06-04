@@ -25,7 +25,7 @@ exports.login = async (req, res) => {
       );
       res.cookie("token", token);
       delete user.password;
-      console.log(user);
+
       res.json(user);
     } else {
       res.status(400).json("Mauvais email ou mot de passe");

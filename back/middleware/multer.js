@@ -4,10 +4,12 @@ const MIME_TYPES = {
   "image/jpg": "jpg",
   "image/jpeg": "jpeg",
   "image/png": "png",
+  "image/gif": "gif",
 };
 
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {
+    // console.log(req._parsedUrl); originalUrl
     callback(null, "uploads/posts");
   },
   filename: (req, file, callback) => {
@@ -20,7 +22,6 @@ const storage = multer.diskStorage({
 const upload = multer({
   storage: storage,
   fileFilter: function (req, file, callback) {
-    console.log({ file });
     if (Object.keys(MIME_TYPES).indexOf(file.mimetype) == -1) {
       return callback(new Error("Format incorrect"));
     }
