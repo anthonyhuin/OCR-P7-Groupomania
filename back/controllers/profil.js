@@ -3,10 +3,10 @@ const Post = db.post;
 const User = db.user;
 const Like = db.like;
 const Comment = db.comment;
-
+const fs = require("fs");
 exports.getPostProfil = async (req, res) => {
   try {
-    const post = await Post.findAll({ raw: true, order: [["id", "DESC"]], where: { userId: req.params.id } });
+    const post = await Post.findAll({ raw: true, order: [["id", "DESC"]], where: { userId: req.params.id, active: 1 } });
 
     const postWithInfo = await Promise.all(
       post.map(async (post) => {
@@ -19,11 +19,11 @@ exports.getPostProfil = async (req, res) => {
           hasLiked = true;
         }
         const commentCount = await Comment.count({ where: { postId: post.id } });
-        const commentContent = await Comment.findAll({ raw: true, order: [["id", "DESC"]], where: { postId: post.id } });
+        const commentContent = await Comment.findAll({ raw: true, order: [["id", "DESC"]], where: { postId: post.id, active: 1 } });
 
         const commentWithInfo = await Promise.all(
           commentContent.map(async (comment) => {
-            const userInfos = await User.findOne({ attributes: ["id", "firstName", "lastName", "profilePicture"], where: { id: comment.userId } });
+            const userInfos = await User.findOne({ attributes: ["id", "firstName", "lastName", "profilePicture"], where: { id: comment.userId, active: 1 } });
             return {
               ...comment,
               firstName: userInfos.firstName,
@@ -77,6 +77,45 @@ exports.modifyProfil = async (req, res) => {
     user = await user.save();
 
     res.status(201).json(user);
+  } catch (e) {
+    res.status(403).json({ erreur: e });
+  }
+};
+exports.changeBanner = async (req, res) => {
+  try {
+    const user = await User.findOne({ raw: true, where: { id: req.user.id } });
+    const filename = user.bannerPicture.split("/banner/")[1];
+
+    fs.unlink(`uploads/banner/${filename}`, async () => {
+      let bannerPicture = `${req.protocol}://${req.get("host")}/banner/${req.file.filename}`;
+
+      let newBannerPicture = await User.upsert({
+        id: req.user.id,
+        bannerPicture: bannerPicture,
+      });
+
+      res.status(201).json(newBannerPicture[0].bannerPicture);
+    });
+  } catch (e) {
+    res.status(403).json({ erreur: e });
+  }
+};
+
+exports.changeProfilPicture = async (req, res) => {
+  try {
+    const user = await User.findOne({ raw: true, where: { id: req.user.id } });
+    const filename = user.profilePicture.split("/profil/")[1];
+
+    fs.unlink(`uploads/profil/${filename}`, async () => {
+      let profilePicture = `${req.protocol}://${req.get("host")}/profil/${req.file.filename}`;
+
+      let newprofilePicture = await User.upsert({
+        id: req.user.id,
+        profilePicture: profilePicture,
+      });
+
+      res.status(201).json(newprofilePicture[0].profilePicture);
+    });
   } catch (e) {
     res.status(403).json({ erreur: e });
   }

@@ -29,6 +29,9 @@ module.exports = (sequelize, DataTypes) => {
       profilePicture: {
         type: DataTypes.STRING,
       },
+      bannerPicture: {
+        type: DataTypes.STRING,
+      },
       birthdate: {
         type: DataTypes.STRING,
       },

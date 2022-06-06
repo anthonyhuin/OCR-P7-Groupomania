@@ -134,13 +134,16 @@ function editPost(postId, postContent) {
       <div class="card_header">
         <div class="header_pp"><img :src="post.profilePicture" class="fake_pp" /></div>
         <div class="header_info">
-          <router-link :to="'/profil/' + post.userId" class="menu_link"
-            ><span class="header_pseudo">{{ post.firstName + " " + post.lastName }}</span></router-link
-          >
-
+          <router-link :to="'/profil/' + post.userId" class="menu_link">
+            <span class="header_pseudo">{{ post.firstName + " " + post.lastName }}</span>
+          </router-link>
           <span class="header_time">{{ formatTime(post.createdAt) }} <i class="fa-regular fa-clock"></i></span>
         </div>
-        <div class="header_edit" v-if="userStore.currentUser.id === post.userId" @click="deletePost(post.id, index), (profilStore.posts[index].clickDelete = true)">
+        <div
+          class="header_edit"
+          v-if="userStore.currentUser.id == post.userId || userStore.currentUser.roles == 'admin'"
+          @click="deletePost(post.id, index), (profilStore.posts[index].clickDelete = true)"
+        >
           <i class="fa-solid fa-ellipsis"></i>
         </div>
       </div>
@@ -150,6 +153,7 @@ function editPost(postId, postContent) {
         </p>
         <img v-if="post.picture !== null" :src="post.picture" class="picture_post" />
       </div>
+
       <div class="card_stats">
         <div class="stats_like" :class="{ liked: post.hasLiked }" @click="setLike(post.id, index)"><i class="fa-regular fa-thumbs-up"></i> J'aime ({{ post.likeCount }})</div>
         <div class="stats_comment"><i class="fa-regular fa-comment"></i> Commenter ({{ profilStore.posts[index].comments.length }})</div>
@@ -161,7 +165,7 @@ function editPost(postId, postContent) {
           <div class="comment_bulle">
             <div class="comment_pseudo">
               <router-link :to="'/profil/' + comment.userId" class="menu_link">{{ comment.firstName + " " + comment.lastName }}</router-link>
-              <div class="comment_edit" v-if="userStore.currentUser.id === comment.userId" @click="deleteComment(comment.id, index, key)"><i class="fa-solid fa-ellipsis"></i></div>
+              <div class="comment_edit" v-if="userStore.currentUser.id == comment.userId" @click="deleteComment(comment.id, index, key)"><i class="fa-solid fa-ellipsis"></i></div>
             </div>
             <p class="comment_text">{{ comment.comment }}</p>
             <span class="comment_time">{{ formatTime(comment.createdAt) }} <i class="fa-regular fa-clock"></i></span>

@@ -32,9 +32,9 @@ function deletePost(postId, index) {
   axios
     .delete(`/api/post/${postId}`)
     .then((response) => {
+      postStore.posts[index].clickDelete = true;
       notification("Post supprimé", "success");
       postStore.posts.splice(index, 1);
-      postStore.posts[index].clickDelete = true;
     })
     .catch((error) => {
       notification(error.response.data.erreur, "error");
@@ -99,7 +99,7 @@ function notification(title, type, duration) {
 </script>
 
 <template>
-  <div class="card animate__animated" v-for="(post, index) in postStore.posts" :class="{ animate__zoomOut: postStore.posts[index].clickDelete }">
+  <div class="card animate__animated" v-for="(post, index) in postStore.posts">
     <div class="card_header">
       <div class="header_pp"><img :src="post.profilePicture" class="fake_pp" /></div>
       <div class="header_info">
@@ -108,13 +108,12 @@ function notification(title, type, duration) {
         >
         <span class="header_time">{{ formatTime(post.createdAt) }} <i class="fa-regular fa-clock"></i></span>
       </div>
-      <div class="header_edit" v-if="userStore.currentUser.id !== post.userId" @click="postStore.posts[index].editMode = !postStore.posts[index].editMode">
+      <div class="header_edit" v-if="userStore.currentUser.id == post.userId || userStore.currentUser.roles == 'admin'" @click="postStore.posts[index].editMode = !postStore.posts[index].editMode">
         <i class="fa-solid fa-ellipsis"></i>
 
         <div class="comment_edit_container" v-if="postStore.posts[index].editMode" v-click-outside="() => (postStore.posts[index].editMode = false)">
           <span class="edit_delete" @click="deletePost(post.id, index), (postStore.posts[index].editMode = !postStore.posts[index].editMode)"><i class="fa-solid fa-trash-can"></i> Supprimer</span>
           <span @click="postStore.posts[index].editPost = true"><i class="fa-solid fa-pen-to-square"></i> Editer</span>
-          <span @click="postStore.posts[index].editMode = false"><i class="fa-solid fa-flag"></i> Signaler</span>
         </div>
       </div>
     </div>
@@ -138,7 +137,9 @@ function notification(title, type, duration) {
         <div class="comment_bulle">
           <div class="comment_pseudo">
             <router-link :to="'/profil/' + comment.userId" class="menu_link">{{ comment.firstName + " " + comment.lastName }}</router-link>
-            <div class="comment_edit" v-if="userStore.currentUser.id === comment.userId" @click="deleteComment(comment.id, index, key)"><i class="fa-solid fa-ellipsis"></i></div>
+            <div class="comment_edit" v-if="userStore.currentUser.id === comment.userId || userStore.currentUser.roles == 'admin'" @click="deleteComment(comment.id, index, key)">
+              <i class="fa-solid fa-ellipsis"></i>
+            </div>
           </div>
           <p class="comment_text">{{ comment.comment }}</p>
           <span class="comment_time">{{ formatTime(comment.createdAt) }} <i class="fa-regular fa-clock"></i></span>
@@ -266,13 +267,14 @@ form {
   border: solid 0px transparent;
   flex-shrink: 0;
   box-shadow: 0 0 1px 0 gray inset, 0 0 1px 0 gray;
+  object-fit: cover;
 }
 .fake_pp_comment {
   height: 25px;
   width: 25px;
   border-radius: 50%;
   border: solid 0px black;
-
+  object-fit: cover;
   flex-shrink: 0;
   box-shadow: 0 0 1px transparent;
 }

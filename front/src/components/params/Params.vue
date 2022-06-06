@@ -1,9 +1,16 @@
 <script setup>
 import DeleteAccount from "./DeleteAccount.vue";
+import Test from "./Test.vue";
+const emit = defineEmits(["logout"]);
+function logout() {
+  emit("logout");
+}
 </script>
 
 <template>
-  <DeleteAccount />
+  <div>
+    <DeleteAccount @logout="logout" />
+  </div>
 </template>
 
 <style scoped></style>

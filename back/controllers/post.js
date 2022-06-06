@@ -25,7 +25,7 @@ exports.createPost = async (req, res) => {
 
 exports.getAllPosts = async (req, res) => {
   try {
-    const post = await Post.findAll({ raw: true, order: [["id", "DESC"]] });
+    const post = await Post.findAll({ raw: true, order: [["id", "DESC"]], where: { active: 1 } });
 
     const postWithInfo = await Promise.all(
       post.map(async (post) => {
@@ -38,11 +38,11 @@ exports.getAllPosts = async (req, res) => {
           hasLiked = true;
         }
         const commentCount = await Comment.count({ where: { postId: post.id } });
-        const commentContent = await Comment.findAll({ raw: true, order: [["id", "DESC"]], where: { postId: post.id } });
+        const commentContent = await Comment.findAll({ raw: true, order: [["id", "DESC"]], where: { postId: post.id, active: 1 } });
 
         const commentWithInfo = await Promise.all(
           commentContent.map(async (comment) => {
-            const userInfos = await User.findOne({ attributes: ["id", "firstName", "lastName", "profilePicture"], where: { id: comment.userId } });
+            const userInfos = await User.findOne({ attributes: ["id", "firstName", "lastName", "profilePicture"], where: { id: comment.userId, active: 1 } });
             return {
               ...comment,
               firstName: userInfos.firstName,

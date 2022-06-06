@@ -15,6 +15,7 @@
   border-radius: 50%;
   flex-shrink: 0;
   margin: 0;
+  object-fit: cover;
 }
 .vue-notification {
   // styling

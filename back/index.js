@@ -19,6 +19,7 @@ const profiltApi = require("./routes/profil.api");
 app.use("/posts", express.static(path.join(__dirname, "uploads/posts")));
 app.use("/profil", express.static(path.join(__dirname, "uploads/profil")));
 app.use("/banner", express.static(path.join(__dirname, "uploads/banner")));
+app.use("/default", express.static(path.join(__dirname, "uploads/default")));
 
 app.use(express.json());
 app.use(cookieParser());

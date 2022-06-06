@@ -6,12 +6,23 @@ import { useRoute } from "vue-router";
 import { ref, watch } from "vue";
 import moment from "moment";
 import "moment/dist/locale/fr";
+import { notify } from "@kyvg/vue3-notification";
 const postStore = usePost();
 const userStore = useUser();
 const route = useRoute();
 
+function notification(title, type, duration) {
+  notify({
+    duration: duration ? duration : 4000,
+    type: type ? type : "info",
+    title: title,
+  });
+}
+
 let editProfil = ref(false);
 let infoProfil = ref([]);
+let imageBanner = ref(null);
+let imageProfil = ref(null);
 
 if (route.params.id == "") {
   route.params.id = userStore.currentUser.id;
@@ -44,6 +55,69 @@ function formatTime(time, method) {
     return moment(time, "YYYY-MM-DD hh-mm-ss").fromNow();
   }
 }
+
+function changeBanner(e) {
+  const regexImage = new RegExp("(image)[\/](gif|jpg|jpeg|png)");
+  imageBanner = e.target.files[0];
+  if (imageBanner != undefined) {
+    if (imageBanner.size > 1000000) {
+      imageBanner = null;
+      notification("Le fichier dépasse 1mo", "error");
+    } else {
+      if (regexImage.test(imageBanner.type)) {
+        let data = { picture: imageBanner };
+        axios
+          .post("/api/profil/upload/banner", data, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then((response) => {
+            userStore.currentUser.bannerPicture = response.data;
+            infoProfil.bannerPicture = response.data;
+          })
+          .catch((error) => {
+            notification(error.response.data.erreur, "error");
+          });
+      } else {
+        imageBanner = null;
+        notification("Format de fichier incompatabile", "error");
+      }
+    }
+  }
+}
+
+function changeProfilPicture(e) {
+  const regexImage = new RegExp("(image)[\/](gif|jpg|jpeg|png)");
+  imageProfil = e.target.files[0];
+
+  if (imageProfil != undefined) {
+    if (imageProfil.size > 1000000) {
+      imageProfil = null;
+      notification("Le fichier dépasse 1mo", "error");
+    } else {
+      if (regexImage.test(imageProfil.type)) {
+        let data = { picture: imageProfil };
+        axios
+          .post("/api/profil/upload/pp", data, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then((response) => {
+            userStore.currentUser.profilePicture = response.data;
+            infoProfil.profilePicture = response.data;
+          })
+          .catch((error) => {
+            notification(error.response.data.erreur, "error");
+          });
+      } else {
+        imageProfil = null;
+        notification("Format de fichier incompatabile", "error");
+      }
+    }
+  }
+}
 </script>
 
 <template>
@@ -52,12 +126,17 @@ function formatTime(time, method) {
     <div class="containter">
       <div class="card">
         <div class="card_background">
-          <img src="@/assets/images/casey-horner-rtCujH697DU-unsplash (1).jpg" alt="" class="background_img" />
+          <input @change="changeBanner" type="file" name="picture" id="picture" class="inputfile" accept="image/png, image/jpeg, image/jpg, image/gif" />
+          <label for="picture"> <img :src="userStore.currentUser.bannerPicture" alt="" class="background_img" /></label>
+
           <div @click="editProfil = !editProfil" class="btn">Éditer le profil</div>
         </div>
 
         <div class="header_img">
-          <img :src="userStore.currentUser.profilePicture" class="card_pp" /><span class="body_pseudo">{{ userStore.currentUser.firstName + " " + userStore.currentUser.lastName }}</span>
+          <input @change="changeProfilPicture" type="file" name="profilpicture" id="profilpicture" class="inputfile" accept="image/png, image/jpeg, image/jpg, image/gif" />
+          <label for="profilpicture" class="label_pp"><img :src="userStore.currentUser.profilePicture" class="card_pp" /></label>
+
+          <span class="body_pseudo">{{ userStore.currentUser.firstName + " " + userStore.currentUser.lastName }}</span>
           <span class="header_post">{{ userStore.currentUser.poste }}</span>
         </div>
 
@@ -71,11 +150,11 @@ function formatTime(time, method) {
       </div>
     </div>
   </div>
-  <div v-else>
+  <div v-else-if="infoProfil.active == 1">
     <div class="containter">
       <div class="card">
         <div class="card_background">
-          <img src="@/assets/images/casey-horner-rtCujH697DU-unsplash (1).jpg" alt="" class="background_img" />
+          <img :src="infoProfil.bannerPicture" alt="" class="background_img" />
         </div>
 
         <div class="header_img">
@@ -93,9 +172,30 @@ function formatTime(time, method) {
       </div>
     </div>
   </div>
+  <div v-else>
+    <div class="containter">
+      <div class="card"><h1>Compte désactivé</h1></div>
+    </div>
+  </div>
 </template>
 
 <style scoped>
+.label_pp {
+  border-radius: 50%;
+  height: 115px;
+  width: 115px;
+}
+.inputfile {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+.inputfile + label {
+  cursor: pointer; /* "hand" cursor */
+}
 .card {
   background-color: var(--background-card);
   display: flex;
@@ -123,7 +223,7 @@ function formatTime(time, method) {
 
 }
 .header_img {
-      margin-top: -57.5px;
+  margin-top: -57.5px;
   display: flex;
   width: 100%;
   height: 100%;
@@ -142,10 +242,10 @@ function formatTime(time, method) {
 }
 .card_pp {
 box-shadow: 0 0 0px 0 white inset, 0 0 3px 0 white;
-  max-height: 115px;
-
+  height: 115px;
+object-fit: cover;
   border-radius: 50%;
-  max-width: 115px;
+  width: 115px;
 }
 /*/ /////////////////////////////////////////////////////////*/
 .card_body {

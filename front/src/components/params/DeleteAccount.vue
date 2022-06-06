@@ -12,7 +12,7 @@ let confirmDisable = ref(false);
 
 function disableAccount() {
   axios
-    .get("/api/user/disable")
+    .get(`/api/user/disable/${userStore.currentUser.id}`)
     .then((response) => {
       notify({
         duration: 20000,

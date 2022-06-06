@@ -12,7 +12,8 @@ exports.signIn = async (req, res) => {
     email: req.body.email,
     firstName: req.body.firstname,
     lastName: req.body.lastname,
-    profilePicture: `https://avatars.dicebear.com/api/adventurer-neutral/${req.body.firstname}.svg`,
+    profilePicture: `http://localhost:8000/default/pp.png`,
+    bannerPicture: `http://localhost:8000/default/banner.png`,
     password: await bcrypt.hash(req.body.password, 8),
   };
 
@@ -74,11 +75,11 @@ exports.disableAccount = async (req, res) => {
 
     await User.upsert({
       id: req.user.id,
-      active: 0,
+      active: 1,
     });
 
     await Post.update(
-      { active: 0 },
+      { active: 1 },
       {
         where: {
           userId: req.user.id,
@@ -87,7 +88,7 @@ exports.disableAccount = async (req, res) => {
     );
 
     await Comment.update(
-      { active: 0 },
+      { active: 1 },
       {
         where: {
           userId: req.user.id,
