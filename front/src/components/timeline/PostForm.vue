@@ -3,34 +3,38 @@ import { z } from "zod";
 import { toFormValidator } from "@vee-validate/zod";
 import { useField, useForm } from "vee-validate";
 import { useRouter } from "vue-router";
-import { createPost } from "@/shared/services/post.service";
 import { useUser, usePost } from "@/shared/stores";
 import axios from "axios";
-import { onMounted, ref } from "vue";
+import { ref } from "vue";
 const userStore = useUser();
 const postStore = usePost();
 const router = useRouter();
 let clean = ref("");
+clean.value = "bonjour";
 let imagePost = ref(null);
 let imagePreview = ref(null);
 let inputfile = ref(null);
 
 const validationSchema = toFormValidator(
   z.object({
-    post: z.string({ required_error: "Veuillez renseigner ce champ" }).max(500, "Le post doit faire moins de 500 caractères"),
+    post: z.string({ required_error: "Veuillez renseigner ce champ" }).max(500, "Le post doit faire moins de 500 caractères").min(1, "Le post doit faire plus de 1 caractère"),
   })
 );
 
 function onChange(e) {
-  const regexImage = new RegExp("(image)[\/](gif|jpg|jpeg|tiff|png)");
+  const regexImage = new RegExp("(image)[\/](gif|jpg|jpeg|png)");
   imagePost = e.target.files[0];
-
-  if (regexImage.test(imagePost.type)) {
-    imagePreview.value = URL.createObjectURL(imagePost);
-    setErrors({ post: "" });
+  if (e.target.files[0].size > 1000000) {
+    imagePost = null;
+    setErrors({ post: "Le fichier dépasse 1moo" });
   } else {
-    imagePost.value = null;
-    setErrors({ post: "format incorect" });
+    if (regexImage.test(imagePost.type)) {
+      imagePreview.value = URL.createObjectURL(imagePost);
+      setErrors({ post: "" });
+    } else {
+      imagePost = null;
+      setErrors({ post: "Format de fichier incompatabile" });
+    }
   }
 }
 
@@ -54,9 +58,9 @@ const submit = handleSubmit((formValue) => {
     })
     .then((response) => {
       postStore.posts.splice(0, 0, response.data);
-      postValue.value = "";
       imagePost = null;
       imagePreview.value = "";
+      postValue.value = "";
     })
     .catch((error) => {
       setErrors({ post: error.response.data.erreur });
@@ -68,11 +72,11 @@ const { value: postValue, errorMessage: postError } = useField("post");
 
 <template>
   <div class="form_main">
-    <h2 @click="test">Accueil</h2>
+    <h2>Accueil</h2>
     <form @submit.prevent="submit" enctype="multipart/form-data">
       <div class="form_container">
         <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="profil_pic" alt="" /></div>
-        <resize-textarea name="post" ref="clean" id="post" placeholder="Quoi de neuf ?" :rows="2" :cols="4" :maxHeight="500" v-model="postValue"> </resize-textarea>
+        <textarea name="post" id="post" placeholder="Quoi de neuf ?" rows="2" v-model.lazy="postValue"> </textarea>
       </div>
 
       <div class="form-button">

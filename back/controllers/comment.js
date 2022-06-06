@@ -27,9 +27,9 @@ exports.deleteComment = async (req, res) => {
     const comment = await Comment.findOne({ attributes: ["userId"], where: { id: req.params.id } });
 
     if (req.user.id !== comment.dataValues.userId) {
-      return res.status(400).send({
-        error: "Action non autorisée",
-      });
+      if (req.user.roles != "admin") {
+        return res.status(401).send({ erreur: "Action non autorisée" });
+      }
     } else {
       await Comment.destroy({ where: { id: req.params.id } });
     }

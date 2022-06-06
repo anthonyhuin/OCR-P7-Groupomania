@@ -77,9 +77,9 @@ exports.deletePost = async (req, res) => {
     const post = await Post.findOne({ where: { id: req.params.id } });
 
     if (req.user.id !== post.dataValues.userId) {
-      return res.status(400).send({
-        erreur: "Action non autorisée",
-      });
+      if (req.user.roles != "admin") {
+        return res.status(401).send({ erreur: "Action non autorisée" });
+      }
     }
 
     if (post.dataValues.picture != null) {

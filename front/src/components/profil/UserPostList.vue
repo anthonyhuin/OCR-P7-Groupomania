@@ -8,7 +8,7 @@ import axios from "axios";
 import { useProfil, useUser } from "@/shared/stores";
 import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
-import Textarea from "../textarea.vue";
+
 import { notify } from "@kyvg/vue3-notification";
 import "animate.css";
 const profilStore = useProfil();

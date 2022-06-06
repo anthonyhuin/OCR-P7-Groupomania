@@ -16,7 +16,7 @@ const router = useRouter();
 <template>
   <div class="appcontainer">
     <Nav class="nav" @logout="logout" />
-    <router-view class="content"></router-view>
+    <router-view class="content" @logout="logout"></router-view>
     <Aside class="aside" />
   </div>
 </template>

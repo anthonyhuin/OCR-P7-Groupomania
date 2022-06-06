@@ -1,7 +1,10 @@
 const bcrypt = require("bcrypt");
 const jsonwebtoken = require("jsonwebtoken");
 const db = require("../database/index");
+const Post = db.post;
 const User = db.user;
+const Like = db.like;
+const Comment = db.comment;
 const { keyPub } = require("../keys");
 
 exports.signIn = async (req, res) => {
@@ -56,5 +59,48 @@ exports.getUserId = async (req, res) => {
     }
   } catch (e) {
     res.json(e);
+  }
+};
+
+exports.disableAccount = async (req, res) => {
+  try {
+    if (req.user.id != req.params.id) {
+      if (req.user.roles != "admin") {
+        return res.status(401).send({ erreur: "Action non autorisée" });
+      }
+    }
+
+    const user = await User.findOne({ where: { id: req.user.id } });
+
+    await User.upsert({
+      id: req.user.id,
+      active: 0,
+    });
+
+    await Post.update(
+      { active: 0 },
+      {
+        where: {
+          userId: req.user.id,
+        },
+      }
+    );
+
+    await Comment.update(
+      { active: 0 },
+      {
+        where: {
+          userId: req.user.id,
+        },
+      }
+    );
+
+    await Like.destroy({
+      where: { userId: req.user.id },
+    });
+
+    res.status(200).json("ok");
+  } catch (e) {
+    res.status(400).json({ erreur: e });
   }
 };

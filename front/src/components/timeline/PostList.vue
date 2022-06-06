@@ -34,9 +34,10 @@ function deletePost(postId, index) {
     .then((response) => {
       notification("Post supprimé", "success");
       postStore.posts.splice(index, 1);
+      postStore.posts[index].clickDelete = true;
     })
     .catch((error) => {
-      notification(error.response.data.error, "error");
+      notification(error.response.data.erreur, "error");
     });
 }
 
@@ -48,7 +49,7 @@ function deleteComment(commentId, indexPost, indexComment) {
       postStore.posts[indexPost].comments.splice(indexComment, 1);
     })
     .catch((error) => {
-      notification(error.response.data.error, "error");
+      notification(error.response.data.erreur, "error");
     });
 }
 
@@ -107,13 +108,11 @@ function notification(title, type, duration) {
         >
         <span class="header_time">{{ formatTime(post.createdAt) }} <i class="fa-regular fa-clock"></i></span>
       </div>
-      <div class="header_edit" v-if="userStore.currentUser.id === post.userId" @click="postStore.posts[index].editMode = !postStore.posts[index].editMode">
+      <div class="header_edit" v-if="userStore.currentUser.id !== post.userId" @click="postStore.posts[index].editMode = !postStore.posts[index].editMode">
         <i class="fa-solid fa-ellipsis"></i>
 
         <div class="comment_edit_container" v-if="postStore.posts[index].editMode" v-click-outside="() => (postStore.posts[index].editMode = false)">
-          <span class="edit_delete" @click="deletePost(post.id, index), (postStore.posts[index].clickDelete = true), (postStore.posts[index].editMode = !postStore.posts[index].editMode)"
-            ><i class="fa-solid fa-trash-can"></i> Supprimer</span
-          >
+          <span class="edit_delete" @click="deletePost(post.id, index), (postStore.posts[index].editMode = !postStore.posts[index].editMode)"><i class="fa-solid fa-trash-can"></i> Supprimer</span>
           <span @click="postStore.posts[index].editPost = true"><i class="fa-solid fa-pen-to-square"></i> Editer</span>
           <span @click="postStore.posts[index].editMode = false"><i class="fa-solid fa-flag"></i> Signaler</span>
         </div>
@@ -149,8 +148,7 @@ function notification(title, type, duration) {
     <div class="card_form">
       <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="fake_pp_comment" /></div>
       <form @submit.prevent="createComment(post.id, this.inputParams[index], index), (this.inputParams[index] = null)" class="card_form_input">
-        <resize-textarea :placeholder="'Répondre à ' + post.firstName" name="text" id="commentaire" :minHeight="30" :rows="1" :cols="4" :maxHeight="200" v-model="inputParams[index]">
-        </resize-textarea>
+        <textarea :placeholder="'Répondre à ' + post.firstName" class="input_comment" name="text" id="commentaire" v-model="inputParams[index]"> </textarea>
 
         <button class="card_btn btn"><i class="fa-regular fa-comments"></i></button>
       </form>
@@ -161,6 +159,10 @@ function notification(title, type, duration) {
 :root {
   --animate-duration: 500ms;
   --animate-delay: 0.5s;
+}
+
+.input_comment {
+  height: 30px;
 }
 .edit_post_form {
   display: flex;
@@ -184,7 +186,7 @@ function notification(title, type, duration) {
   z-index: 1000;
   display: flex;
   flex-direction: column;
-
+  user-select: none;
   min-width: 130px;
   box-shadow: rgb(101 119 134 / 20%) 0px 0px 15px, rgb(101 119 134 / 15%) 0px 0px 3px 1px;
 
