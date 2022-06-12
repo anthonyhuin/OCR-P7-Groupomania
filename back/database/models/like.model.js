@@ -1,18 +1,33 @@
+"use strict";
+
+const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
-  const Like = sequelize.define(
-    "Like",
+  class Like extends Model {
+    static associate(models) {
+      models.Like.belongsTo(models.User, {
+        foreignKey: "userId",
+      });
+      models.Like.belongsTo(models.Post, {
+        foreignKey: "postId",
+      });
+    }
+  }
+  Like.init(
     {
-      userId: {
+      postId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
-      postId: {
+      userId: {
         type: DataTypes.INTEGER,
         allowNull: false,
       },
     },
     {
       freezeTableName: true,
+      sequelize,
+      modelName: "Like",
     }
   );
   return Like;

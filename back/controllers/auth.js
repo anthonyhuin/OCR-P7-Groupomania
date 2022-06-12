@@ -1,7 +1,10 @@
 const bcrypt = require("bcrypt");
 const jsonwebtoken = require("jsonwebtoken");
-const db = require("../database/index");
-const User = db.user;
+const db = require("../database/models");
+const Post = db.Post;
+const User = db.User;
+const Like = db.Like;
+const Comment = db.Comment;
 const { key } = require("../keys");
 
 exports.login = async (req, res) => {

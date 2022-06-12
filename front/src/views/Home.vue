@@ -26,7 +26,7 @@ const router = useRouter();
   position: relative;
   padding: 0 20px 0 20px;
   min-height: 100vh;
-  max-width: 1100px;
+  max-width: 1120px;
   margin: 20px auto;
   display: grid;
   grid-template-columns: 0.4fr 1fr 0.5fr;
@@ -54,22 +54,21 @@ const router = useRouter();
   position: sticky;
   top: 0;
   align-self: start;
-
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
 .profil_pic {
-  height: 40px;
-  width: 40px;
+  height: 47px;
+  width: 47px;
   overflow: hidden;
   border-radius: 50%;
-
+  object-fit: cover;
   flex-shrink: 0;
   margin: 0;
 }
-@media only screen and (max-width: 700px) {
+@media only screen and (max-width: 800px) {
   .nav {
     position: fixed;
     bottom: 0;
@@ -79,12 +78,14 @@ const router = useRouter();
     width: 100%;
     height: 60px;
     border-radius: unset;
-    width: 100%;
+
     min-height: 60px;
     flex-direction: row !important;
   }
   .appcontainer {
     grid-template-columns: 1fr;
+    margin: 0px auto;
+    padding: 0 0px 0 0px;
   }
   .aside {
     display: none;
@@ -96,16 +97,13 @@ const router = useRouter();
     margin-top: 10px;
     background-color: var(--background);
   }
-  .appcontainer {
-    margin: 10px auto;
-  }
 }
-@media only screen and (min-width: 700px) {
+@media only screen and (min-width: 800px) {
   .reponsiveLogo {
     display: none;
   }
 }
-@media only screen and (min-width: 700px) and (max-width: 992px) {
+@media only screen and (min-width: 800px) and (max-width: 992px) {
   .appcontainer {
     grid-template-columns: 60px 1fr 0.4fr;
   }

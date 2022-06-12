@@ -20,7 +20,7 @@
 
   --border: solid 0px #ffd7d7;
   --border-in: solid 1px #e5e5e5;
-  --border-radius: 2px;
+  --border-radius: 5px;
   --box-shadow: 0 1px 2px rgba(82, 82, 82, 0.2);
   --p-5: 5px;
   --p-10: 10px;
@@ -118,5 +118,68 @@ textarea::placeholder {
   color: var(--gray-3);
   &:hover {
     background-color: var(--gray-1) !important;
+  }
+}
+.loader_container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 20px 0;
+}
+
+$spinner_speed: 0.5s;
+$spinner_radius: 80%;
+$spinner_fill_radius: 90px;
+
+$spinner_size: 60px;
+$spinner_thickness: 10px;
+$spinner_inner_circle: $spinner_size - $spinner_thickness;
+
+$spinner_color: var(--primary-1);
+$spinner_bg: var(--gray-4);
+$spinner_inner_bg: var(--background);
+
+.loader {
+  border-radius: 80%;
+  display: block;
+  height: $spinner_size;
+  width: $spinner_size;
+  position: relative;
+  animation: spin $spinner_speed linear 0s infinite normal;
+  background: $spinner_bg;
+
+  &:before,
+  &:after {
+    content: "";
+    display: block;
+    position: absolute;
+  }
+
+  &:before {
+    border-radius: 0 $spinner_fill_radius $spinner_fill_radius 0;
+    height: $spinner_size;
+    width: 50%;
+    top: 0;
+    right: 0;
+    z-index: 1;
+    background: $spinner_color;
+    background-image: linear-gradient($spinner_bg, $spinner_color);
+  }
+
+  &:after {
+    border-radius: $spinner_radius;
+    height: $spinner_inner_circle;
+    width: $spinner_inner_circle;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1;
+    background: $spinner_inner_bg;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
   }
 }

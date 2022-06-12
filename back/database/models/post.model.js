@@ -1,6 +1,16 @@
+const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
-  const Post = sequelize.define(
-    "Post",
+  class Post extends Model {
+    static associate(models) {
+      models.Post.belongsTo(models.User, {
+        foreignKey: "userId",
+      });
+      models.Post.hasMany(models.Like, { foreignKey: "postId" });
+      models.Post.hasMany(models.Comment, { foreignKey: "postId" });
+    }
+  }
+  Post.init(
     {
       userId: {
         type: DataTypes.INTEGER,
@@ -17,9 +27,42 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.BOOLEAN,
         defaultValue: true,
       },
+
+      editPost: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return false;
+        },
+      },
+      editMode: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return false;
+        },
+      },
+      hasLiked: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return false;
+        },
+      },
+      commentCount: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return 5;
+        },
+      },
+      likeCount: {
+        type: DataTypes.VIRTUAL,
+        get() {
+          return 5;
+        },
+      },
     },
     {
       freezeTableName: true,
+      sequelize,
+      modelName: "Post",
     }
   );
   return Post;

@@ -97,7 +97,7 @@ li a:hover {
   font-weight: 500;
   cursor: pointer;
 }
-@media only screen and (max-width: 700px) {
+@media only screen and (max-width: 800px) {
   .nav {
     border-top: var(--border-in);
   }

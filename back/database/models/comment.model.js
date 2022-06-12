@@ -1,6 +1,19 @@
+"use strict";
+
+const { Model } = require("sequelize");
+
 module.exports = (sequelize, DataTypes) => {
-  const Comment = sequelize.define(
-    "Comment",
+  class Comment extends Model {
+    static associate(models) {
+      models.Comment.belongsTo(models.User, {
+        foreignKey: "userId",
+      });
+      models.Comment.belongsTo(models.Post, {
+        foreignKey: "postId",
+      });
+    }
+  }
+  Comment.init(
     {
       userId: {
         type: DataTypes.INTEGER,
@@ -22,6 +35,8 @@ module.exports = (sequelize, DataTypes) => {
     },
     {
       freezeTableName: true,
+      sequelize,
+      modelName: "Comment",
     }
   );
   return Comment;

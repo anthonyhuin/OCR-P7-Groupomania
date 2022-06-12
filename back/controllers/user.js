@@ -1,10 +1,11 @@
 const bcrypt = require("bcrypt");
 const jsonwebtoken = require("jsonwebtoken");
-const db = require("../database/index");
-const Post = db.post;
-const User = db.user;
-const Like = db.like;
-const Comment = db.comment;
+const db = require("../database/models");
+const Post = db.Post;
+const User = db.User;
+const Like = db.Like;
+const Comment = db.Comment;
+const { Op, Sequelize } = require("sequelize");
 const { keyPub } = require("../keys");
 
 exports.signIn = async (req, res) => {
@@ -71,36 +72,57 @@ exports.disableAccount = async (req, res) => {
       }
     }
 
-    const user = await User.findOne({ where: { id: req.user.id } });
-
-    await User.upsert({
-      id: req.user.id,
-      active: 1,
-    });
-
-    await Post.update(
-      { active: 1 },
-      {
-        where: {
-          userId: req.user.id,
-        },
-      }
-    );
-
-    await Comment.update(
-      { active: 1 },
-      {
-        where: {
-          userId: req.user.id,
-        },
-      }
-    );
-
-    await Like.destroy({
-      where: { userId: req.user.id },
-    });
+    await User.upsert({ id: req.user.id, active: 1 });
+    await Post.update({ active: 1 }, { where: { userId: req.user.id } });
+    await Comment.update({ active: 1 }, { where: { userId: req.user.id } });
+    await Like.destroy({ where: { userId: req.user.id } });
 
     res.status(200).json("ok");
+  } catch (e) {
+    res.status(400).json({ erreur: e });
+  }
+};
+
+exports.suggestUsers = async (req, res) => {
+  try {
+    const users = await User.findAll({
+      attributes: ["id", "firstName", "lastName", "profilePicture"],
+      order: Sequelize.literal("rand()"),
+      limit: 3,
+      where: {
+        id: {
+          [Op.ne]: req.user.id,
+        },
+        active: 1,
+      },
+    });
+    res.status(200).json(users);
+  } catch (e) {
+    res.status(400).json({ erreur: e });
+  }
+};
+
+exports.findBirthday = async (req, res) => {
+  try {
+    const users = await User.findAll({ raw: true, attributes: ["id", "firstName", "lastName", "profilePicture", "birthdate"] });
+
+    let date = new Date();
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+    let dataBirthdate = null;
+
+    await Promise.all(
+      users.map(async (user) => {
+        let birthdate = user.birthdate.split("-");
+
+        if (birthdate[1] - month == 0 && birthdate[2] - day == 0) {
+          dataBirthdate = user;
+          return;
+        }
+      })
+    );
+
+    res.status(200).json(dataBirthdate);
   } catch (e) {
     res.status(400).json({ erreur: e });
   }

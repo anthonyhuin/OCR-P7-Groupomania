@@ -1,8 +1,8 @@
-const db = require("../database/index");
-const Post = db.post;
-const User = db.user;
-const Like = db.like;
-const Comment = db.comment;
+const db = require("../database/models");
+const Post = db.Post;
+const User = db.User;
+const Like = db.Like;
+const Comment = db.Comment;
 const fs = require("fs");
 
 exports.createPost = async (req, res) => {
@@ -25,50 +25,34 @@ exports.createPost = async (req, res) => {
 
 exports.getAllPosts = async (req, res) => {
   try {
-    const post = await Post.findAll({ raw: true, order: [["id", "DESC"]], where: { active: 1 } });
-
-    const postWithInfo = await Promise.all(
-      post.map(async (post) => {
-        const userInfos = await User.findOne({ attributes: ["id", "firstName", "lastName", "profilePicture"], where: { id: post.userId } });
-        const likeCount = await Like.count({ where: { postId: post.id } });
-        let hasLiked = await Like.findOne({ where: { postId: post.id, userId: req.user.id } });
-        if (hasLiked === null) {
-          hasLiked = false;
-        } else {
-          hasLiked = true;
-        }
-        const commentCount = await Comment.count({ where: { postId: post.id } });
-        const commentContent = await Comment.findAll({ raw: true, order: [["id", "DESC"]], where: { postId: post.id, active: 1 } });
-
-        const commentWithInfo = await Promise.all(
-          commentContent.map(async (comment) => {
-            const userInfos = await User.findOne({ attributes: ["id", "firstName", "lastName", "profilePicture"], where: { id: comment.userId, active: 1 } });
-            return {
-              ...comment,
-              firstName: userInfos.firstName,
-              lastName: userInfos.lastName,
-              profilePicture: userInfos.profilePicture,
-            };
-          })
-        );
-        return {
-          ...post,
-          firstName: userInfos.firstName,
-          lastName: userInfos.lastName,
-          profilePicture: userInfos.profilePicture,
-          likeCount: likeCount,
-          commentCount: commentCount,
-          hasLiked: hasLiked,
-          comments: commentWithInfo,
-          editMode: false,
-          editPost: false,
-        };
-      })
-    );
-
-    res.status(201).json(postWithInfo);
+    const posts = await Post.findAll({
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: User,
+          attributes: ["firstName", "lastName", "id", "profilePicture"],
+        },
+        {
+          model: Like,
+          attributes: ["userId", "postId"],
+        },
+        {
+          model: Comment,
+          attributes: ["comment", "active", "id", "createdAt"],
+          order: [["createdAt", "DESC"]],
+          include: [
+            {
+              model: User,
+              attributes: ["firstName", "lastName", "id", "profilePicture"],
+            },
+          ],
+        },
+      ],
+    });
+    res.status(200).send(posts);
   } catch (e) {
-    res.status(403).json({ erreur: e });
+    res.status(400).json(e);
+    console.log(e);
   }
 };
 

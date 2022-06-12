@@ -1,8 +1,8 @@
-const db = require("../database/index");
-const Post = db.post;
-const User = db.user;
-const Like = db.like;
-const Comment = db.comment;
+const db = require("../database/models");
+const Post = db.Post;
+const User = db.User;
+const Like = db.Like;
+const Comment = db.Comment;
 const fs = require("fs");
 exports.getPostProfil = async (req, res) => {
   try {
@@ -54,7 +54,9 @@ exports.getPostProfil = async (req, res) => {
 exports.getInfoProfil = async (req, res) => {
   try {
     const user = await User.findOne({ attributes: { exclude: ["password"] }, raw: true, where: { id: req.params.id } });
-
+    if (user === null) {
+      throw null;
+    }
     res.status(201).json(user);
   } catch (e) {
     res.status(403).json({ erreur: e });

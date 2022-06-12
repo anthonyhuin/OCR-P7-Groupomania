@@ -1,5 +1,8 @@
-const db = require("../database/index");
-const Like = db.like;
+const db = require("../database/models");
+const Post = db.Post;
+const User = db.User;
+const Like = db.Like;
+const Comment = db.Comment;
 
 exports.setLike = async (req, res) => {
   let data = {
@@ -12,12 +15,10 @@ exports.setLike = async (req, res) => {
 
     if (alreadyLiked === null) {
       await Like.create(data);
-      let { count, rows } = await Like.findAndCountAll({ raw: true, distinct: true, where: { postId: req.body.postId } });
-      res.status(200).json({ count, hasLiked: true });
+      res.status(200).json({ liked: true, data });
     } else {
       await Like.destroy({ where: { userId: req.user.id, postId: req.body.postId } });
-      let { count, rows } = await Like.findAndCountAll({ raw: true, distinct: true, where: { postId: req.body.postId } });
-      res.status(200).json({ count, hasLiked: false });
+      res.status(200).json({ liked: false });
     }
   } catch (e) {
     res.status(400).json(e);

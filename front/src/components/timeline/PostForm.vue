@@ -9,8 +9,7 @@ import { ref } from "vue";
 const userStore = useUser();
 const postStore = usePost();
 const router = useRouter();
-let clean = ref("");
-clean.value = "bonjour";
+
 let imagePost = ref(null);
 let imagePreview = ref(null);
 let inputfile = ref(null);
@@ -59,8 +58,9 @@ const submit = handleSubmit((formValue) => {
     .then((response) => {
       postStore.posts.splice(0, 0, response.data);
       imagePost = null;
-      imagePreview.value = "";
+      imagePreview.value = undefined;
       postValue.value = "";
+      setErrors({ post: "" });
     })
     .catch((error) => {
       setErrors({ post: error.response.data.erreur });
@@ -124,10 +124,9 @@ const { value: postValue, errorMessage: postError } = useField("post");
     }
   }
   .preview_image {
-    border-radius: 20px;
     width: 100%;
     max-height: 400px;
-    object-fit: cover;
+    object-fit: contain;
   }
 }
 

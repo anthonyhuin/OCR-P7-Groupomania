@@ -1,8 +1,8 @@
-const db = require("../database/index");
-const Post = db.post;
-const User = db.user;
-const Like = db.like;
-const Comment = db.comment;
+const db = require("../database/models");
+const Post = db.Post;
+const User = db.User;
+const Like = db.Like;
+const Comment = db.Comment;
 
 exports.createComment = async (req, res) => {
   let data = {
@@ -13,8 +13,8 @@ exports.createComment = async (req, res) => {
 
   try {
     const comment = await Comment.create(data);
-    const user = await User.findOne({ attributes: ["firstName", "lastName", "profilePicture"], where: { id: req.user.id } });
-    data = { ...comment.dataValues, ...user.dataValues };
+    const user = await User.findOne({ attributes: ["firstName", "lastName", "profilePicture", "id"], where: { id: req.user.id } });
+    data = { ...comment.dataValues, User: { ...user.dataValues } };
 
     res.status(201).json(data);
   } catch (error) {

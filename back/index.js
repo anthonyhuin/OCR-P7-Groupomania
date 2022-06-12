@@ -5,7 +5,7 @@ const path = require("path");
 const cookieParser = require("cookie-parser");
 const port = "8000";
 const cors = require("cors");
-require("./database");
+require("./database/models");
 
 //import routes
 

@@ -95,7 +95,7 @@ postValue.value = props.post;
   flex-direction: column;
   padding: 10px;
   box-shadow: var(--box-shadow);
-  border-radius: 2px;
+  border-radius: var(--border-radius);
   min-width: 300px;
   padding: 0 20px;
 }

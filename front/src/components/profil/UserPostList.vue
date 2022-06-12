@@ -56,10 +56,12 @@ function deleteComment(commentId, indexPost, indexComment) {
     });
 }
 function getAllPosts() {
+  profilStore.isloading = true;
   axios
     .get(`/api/profil/post/${route.params.id}`)
     .then(function (response) {
       profilStore.posts = response.data;
+      profilStore.isloading = false;
     })
     .catch(function (error) {
       console.log(error);
@@ -124,12 +126,15 @@ function editPost(postId, postContent) {
       });
     });
 }
-
-//v-if="userStore.currentUser.id === post.userId" @click="deletePost(post.id, index), (profilStore.posts[index].clickDelete = true)">
 </script>
 
 <template>
-  <div class="container">
+  <div class="loader_container" v-if="profilStore.isloading">
+    <div class="loader"></div>
+  </div>
+
+  <div class="zero-post" v-else-if="profilStore.posts.length < 1">Aucune publication</div>
+  <div v-else class="container">
     <div class="card animate__animated" v-for="(post, index) in profilStore.posts" :class="{ animate__zoomOut: profilStore.posts[index].clickDelete }">
       <div class="card_header">
         <div class="header_pp"><img :src="post.profilePicture" class="fake_pp" /></div>
@@ -189,6 +194,12 @@ function editPost(postId, postContent) {
   --animate-duration: 800ms;
   --animate-delay: 0.8s;
 }
+.zero-post {
+  font-size: 2rem;
+  text-align: center;
+  margin: 30px;
+  font-weight: 600;
+}
 .byebye {
   background-color: #131313 !important;
 }
@@ -217,25 +228,6 @@ form {
 .error {
   color: var(--danger-1);
 }
-.loader {
-  height: 5rem;
-  width: 5rem;
-  border-radius: 50%;
-  border: 10px solid rgb(192, 192, 192);
-  border-top-color: #131313;
-  box-sizing: border-box;
-  background: transparent;
-  animation: loading 1s linear infinite;
-}
-
-@keyframes loading {
-  0% {
-    transform: rotate(0deg);
-  }
-  0% {
-    transform: rotate(360deg);
-  }
-}
 
 .fake_pp {
   height: 38px;
@@ -260,7 +252,7 @@ form {
   display: flex;
   flex-direction: column;
   padding: 10px;
-  border-radius: 2px;
+  border-radius: var(--border-radius);
   margin-top: 16px;
   box-shadow: var(--box-shadow);
   transition: 0.5s ease-out;
