@@ -68,6 +68,7 @@ const router = useRouter();
   flex-shrink: 0;
   margin: 0;
 }
+
 @media only screen and (max-width: 800px) {
   .nav {
     position: fixed;
@@ -82,15 +83,18 @@ const router = useRouter();
     min-height: 60px;
     flex-direction: row !important;
   }
+
   .appcontainer {
     grid-template-columns: 1fr;
     margin: 0px auto;
     padding: 0 0px 0 0px;
   }
+
   .aside {
     display: none;
     visibility: hidden;
   }
+
   .reponsiveLogo {
     width: 100%;
     max-height: 30px;
@@ -98,11 +102,13 @@ const router = useRouter();
     background-color: var(--background);
   }
 }
+
 @media only screen and (min-width: 800px) {
   .reponsiveLogo {
     display: none;
   }
 }
+
 @media only screen and (min-width: 800px) and (max-width: 992px) {
   .appcontainer {
     grid-template-columns: 60px 1fr 0.4fr;

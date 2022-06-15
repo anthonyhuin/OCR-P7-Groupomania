@@ -72,10 +72,10 @@ exports.disableAccount = async (req, res) => {
       }
     }
 
-    await User.upsert({ id: req.user.id, active: 1 });
-    await Post.update({ active: 1 }, { where: { userId: req.user.id } });
-    await Comment.update({ active: 1 }, { where: { userId: req.user.id } });
+    await User.upsert({ id: req.user.id, active: 0 });
     await Like.destroy({ where: { userId: req.user.id } });
+    await Comment.destroy({ where: { userId: req.user.id } });
+    await Post.destroy({ where: { userId: req.user.id } });
 
     res.status(200).json("ok");
   } catch (e) {
@@ -113,17 +113,19 @@ exports.findBirthday = async (req, res) => {
 
     await Promise.all(
       users.map(async (user) => {
-        let birthdate = user.birthdate.split("-");
+        if (user.birthdate !== null) {
+          let birthdate = user.birthdate.split("-");
 
-        if (birthdate[1] - month == 0 && birthdate[2] - day == 0) {
-          dataBirthdate = user;
-          return;
+          if (birthdate[1] - month == 0 && birthdate[2] - day == 0) {
+            return (dataBirthdate = user);
+          }
         }
       })
     );
 
     res.status(200).json(dataBirthdate);
   } catch (e) {
+    console.log(e);
     res.status(400).json({ erreur: e });
   }
 };

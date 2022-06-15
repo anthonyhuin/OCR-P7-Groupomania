@@ -1,5 +1,3 @@
-"use strict";
-
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
@@ -7,9 +5,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       models.Comment.belongsTo(models.User, {
         foreignKey: "userId",
+        onDelete: "CASCADE",
       });
       models.Comment.belongsTo(models.Post, {
         foreignKey: "postId",
+        onDelete: "CASCADE",
       });
     }
   }
@@ -26,11 +26,6 @@ module.exports = (sequelize, DataTypes) => {
       comment: {
         type: DataTypes.TEXT,
         allowNull: false,
-      },
-
-      active: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
       },
     },
     {

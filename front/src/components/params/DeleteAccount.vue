@@ -37,40 +37,17 @@ const { firstNameError, firstNameValue } = "bonjour";
   <div>
     <h1>Paramètres</h1>
     <div class="card">
-      <h4>Modifier votre mot de passe</h4>
-      <form @submit.prevent="submit">
-        <div class="form">
-          <div class="field name-input">
-            <label class="label" for="username">Mot de passe actuel</label>
-            <input v-model="firstNameValue" type="text" class="input username" name="username" id="firstname" />
-            <p v-if="firstNameError" class="field-error">{{ firstNameError }}</p>
-          </div>
-          <div class="field name-input">
-            <label class="label" for="username">Nouveau mot de passe</label>
-            <input v-model="firstNameValue" type="text" class="input username" name="username" id="firstname" />
-            <p v-if="firstNameError" class="field-error">{{ firstNameError }}</p>
-          </div>
-          <div class="field name-input">
-            <label class="label" for="username">Confirmer le mot de passe</label>
-            <input v-model="firstNameValue" type="text" class="input username" name="username" id="firstname" />
-            <p v-if="firstNameError" class="field-error">{{ firstNameError }}</p>
-          </div>
-        </div>
-
-        <div class="form-controls">
-          <button class="btn submit">Enregistrer</button>
-        </div>
-      </form>
-    </div>
-    <div class="card">
       <h4><i class="fa-solid fa-triangle-exclamation"></i> Ceci désactivera votre compte.</h4>
       <p>
-        Vous vous apprêtez à lancer la procédure de désactivation de votre compte Groupomania. Votre nom d'affichage, vos posts, vos commentaires et votre profil ne seront plus visibles sur
+        Vous vous apprêtez à lancer la procédure de désactivation de votre compte Groupomania. Votre nom d'affichage,
+        vos posts, vos commentaires et votre profil ne seront plus visibles sur
         Groupomania.com.
       </p>
-      <div v-if="!confirmDisable" class="form-controls"><button class="btn danger" @click="confirmDisable = true">Désactiver mon compte</button></div>
+      <div v-if="!confirmDisable" class="form-controls"><button class="btn danger"
+          @click="confirmDisable = true">Désactiver mon compte</button></div>
       <div v-else class="form-controls">
-        <button class="btn neutral" @click="confirmDisable = false">Annuler</button> <button class="btn danger" @click="disableAccount">Désactiver mon compte</button>
+        <button class="btn neutral" @click="confirmDisable = false">Annuler</button> <button class="btn danger"
+          @click="disableAccount">Désactiver mon compte</button>
       </div>
     </div>
   </div>
@@ -138,6 +115,7 @@ const { firstNameError, firstNameValue } = "bonjour";
   box-shadow: var(--box-shadow);
   margin-bottom: 16px;
 }
+
 h1 {
   margin-bottom: 10px;
 }

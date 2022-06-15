@@ -25,7 +25,7 @@ getsuggestUsers();
     <img src="@/assets/images/ballon.png" class="background" alt="background" />
     <img :src="birthdateUsers.profilePicture" class="profil_pic" alt="" />
     <h4>C'est l'anniversaire de {{ birthdateUsers.firstName }} ! 🍰</h4>
-    <p>Laissez-lui un message avec vos meilleurs vœux sur sa page de profil !</p>
+    <p>Laissez-lui un message avec vos meilleurs vœux !</p>
   </div>
 </template>
 

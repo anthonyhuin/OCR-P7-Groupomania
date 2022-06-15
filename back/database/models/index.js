@@ -1,4 +1,3 @@
-"use strict";
 require("dotenv").config();
 const fs = require("fs");
 const path = require("path");
@@ -38,8 +37,8 @@ Object.keys(db).forEach((modelName) => {
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
 
-db.sequelize.sync().then(() => {
-  console.log("Re-sync done!");
-});
+// db.sequelize.sync().then(() => {
+//   console.log("Re-sync done!");
+// });
 
 module.exports = db;

@@ -19,6 +19,7 @@
   background: var(primary-1) !important;
   border-left: 5px solid var(primary-2) !important;
 }
+
 .notification-title {
   font-size: 1.3rem;
 }

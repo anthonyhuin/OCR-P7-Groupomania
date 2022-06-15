@@ -76,12 +76,13 @@ const { value: postValue, errorMessage: postError } = useField("post");
     <form @submit.prevent="submit" enctype="multipart/form-data">
       <div class="form_container">
         <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="profil_pic" alt="" /></div>
-        <textarea name="post" id="post" placeholder="Quoi de neuf ?" rows="2" v-model.lazy="postValue"> </textarea>
+        <textarea name="post" id="post" placeholder="Quoi de neuf ?" rows="2" v-model.trim="postValue"> </textarea>
       </div>
 
       <div class="form-button">
         <div class="icon_form">
-          <input @change="onChange" type="file" name="picture" id="picture" class="inputfile" ref="inputfile" accept="image/png, image/jpeg, image/jpg, image/gif" />
+          <input @change="onChange" type="file" name="picture" id="picture" class="inputfile" ref="inputfile"
+            accept="image/png, image/jpeg, image/jpg, image/gif" />
           <label for="picture"><i class="fa-solid fa-image"></i></label>
 
           <i class="fa-solid fa-face-grin-wide"></i>
@@ -119,10 +120,12 @@ const { value: postValue, errorMessage: postError } = useField("post");
     align-items: center;
     justify-content: center;
     transition: 0.3s;
+
     &:hover {
       background-color: rgba(122, 122, 122, 0.75);
     }
   }
+
   .preview_image {
     width: 100%;
     max-height: 400px;
@@ -138,8 +141,10 @@ const { value: postValue, errorMessage: postError } = useField("post");
   position: absolute;
   z-index: -1;
 }
-.inputfile + label {
-  cursor: pointer; /* "hand" cursor */
+
+.inputfile+label {
+  cursor: pointer;
+  /* "hand" cursor */
 }
 
 .form-error {
@@ -152,15 +157,18 @@ h2 {
   font-size: 1rem;
   font-weight: 600;
 }
+
 form {
   display: flex;
   flex-direction: column;
   width: 100%;
   gap: 10px;
 }
+
 .form_pp {
   flex-shrink: 0;
 }
+
 .form-button {
   display: flex;
   justify-content: space-between;
@@ -168,11 +176,13 @@ form {
   padding-left: 50px;
   align-items: center;
 }
+
 .form-button i {
   color: var(--primary-1);
   font-size: 1.1rem;
-  margin-right: var(--m-10);
+  margin-right: 10px;
 }
+
 .form_main {
   display: flex;
   align-items: flex-start;
@@ -185,9 +195,11 @@ form {
   border: var(--border);
   border-top: 5px solid var(--primary-1);
 }
+
 .form_main h2 {
   color: var(--text-color);
 }
+
 .form_container {
   display: flex;
   justify-content: center;
@@ -210,7 +222,16 @@ form {
   color: black;
   resize: none;
 }
+
 .form-row__input::placeholder {
   color: #696969;
+}
+
+@media only screen and (max-width: 800px) {
+
+  .form_main {
+    border-radius: 0 0 5px 5px !important;
+  }
+
 }
 </style>

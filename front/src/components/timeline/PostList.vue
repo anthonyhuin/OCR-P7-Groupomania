@@ -4,13 +4,12 @@ import "moment/dist/locale/fr";
 import axios from "axios";
 import { usePost, useUser } from "@/shared/stores";
 import { ref } from "vue";
-import "animate.css";
 import { notify } from "@kyvg/vue3-notification";
 import EditPost from "./EditPost.vue";
 
 const postStore = usePost();
 const userStore = useUser();
-let inputParams = ref([]);
+let inputComment = ref([]);
 
 
 function setLike(postId, index) {
@@ -87,10 +86,10 @@ function createComment(postId, comment, index) {
   axios
     .post(`/api/comment/${postId}`, body)
     .then((response) => {
-      console.log(response.data);
+
       postStore.posts[index].Comments.splice(0, 0, response.data);
-      console.log(index);
-      inputParams = "";
+
+      inputComment = "";
     })
     .catch((error) => {
       notification(error, "error");
@@ -105,23 +104,30 @@ function notification(title, type, duration) {
   });
 }
 
+function displayOptionBtn(postUserId) {
+  if (userStore.currentUser.id == postUserId || userStore.currentUser.roles == 'admin')
+    return true
+  else return false
+}
+
+
 </script>
 
 <template>
   <div>
-    <div class="card" v-for="(post, index) in postStore.posts">
+
+    <article class="card" v-for="(post, index) in postStore.posts">
       <div class="card_header">
         <div class="header_pp"><img :src="post.User.profilePicture" class="fake_pp" /></div>
 
         <div class="header_info">
           <router-link :to="'/profil/' + post.User.id" class="menu_link">
-            <span class="header_pseudo">{{ post.User.firstName + " " + post.User.lastName }}</span>
+            <span class="header_pseudo">{{ post.User.firstName }} {{ post.User.lastName }}</span>
           </router-link>
           <span class="header_time">{{ formatTime(post.createdAt) }} <i class="fa-regular fa-clock"></i></span>
         </div>
 
-        <div class="header_edit"
-          v-if="userStore.currentUser.id == post.User.id || userStore.currentUser.roles == 'admin'"
+        <div class="header_edit" v-if="displayOptionBtn(post.User.id)"
           @click="postStore.posts[index].editMode = !postStore.posts[index].editMode">
           <i class="fa-solid fa-ellipsis"></i>
 
@@ -147,11 +153,10 @@ function notification(title, type, duration) {
 
       <div class="card_stats">
         <div class="stats_like" :class="{ liked: foundLike(index) }" @click="setLike(post.id, index)"><i
-            class="fa-regular fa-thumbs-up"></i> J'aime ({{
-                postStore.posts[index].Likes.length
-            }})</div>
+            class="fa-regular fa-thumbs-up"></i> J'aime ({{ postStore.posts[index].Likes.length }})</div>
         <div class="stats_comment">
-          <i class="fa-regular fa-comment"></i> Commenter ({{ postStore.posts[index].Comments.length }})
+          <i class="fa-regular fa-comment"></i> Commentaire<span class="comment_plural"
+            v-if="postStore.posts[index].Comments.length > 1">s</span> ({{ postStore.posts[index].Comments.length }})
         </div>
       </div>
 
@@ -160,13 +165,12 @@ function notification(title, type, duration) {
           <div class="comment_pp"><img :src="comment.User.profilePicture" class="fake_pp_comment" /></div>
           <div class="comment_bulle">
             <div class="comment_pseudo">
-              <router-link :to="'/profil/' + comment.User.id" class="menu_link">{{ comment.User.firstName + " " +
+              <router-link :to="'/profil/' + comment.User.id" class="menu_link">{{ comment.User.firstName }} {{
                   comment.User.lastName
               }}</router-link>
-              <div class="comment_edit"
-                v-if="userStore.currentUser.id === comment.User.id || userStore.currentUser.roles == 'admin'"
+              <div class="comment_edit" v-if="displayOptionBtn(comment.User.id)"
                 @click="deleteComment(comment.id, index, key)">
-                <i class="fa-solid fa-ellipsis"></i>
+                <i class="fa-solid fa-trash-can"></i>
               </div>
             </div>
             <p class="comment_text">{{ comment.comment }}</p>
@@ -177,18 +181,26 @@ function notification(title, type, duration) {
 
       <div class="card_form">
         <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="fake_pp_comment" /></div>
-        <form @submit.prevent="createComment(post.id, this.inputParams[index], index), (this.inputParams[index] = null)"
+        <form
+          @submit.prevent="createComment(post.id, this.inputComment[index], index), (this.inputComment[index] = null)"
           class="card_form_input">
           <textarea :placeholder="'Répondre à ' + post.User.firstName" class="input_comment" name="text"
-            id="commentaire" v-model="inputParams[index]"> </textarea>
+            id="commentaire" v-model.trim="inputComment[index]"> </textarea>
           <button class="card_btn btn"><i class="fa-regular fa-comments"></i></button>
         </form>
       </div>
 
-    </div>
+    </article>
   </div>
 </template>
 <style lang="scss" scoped>
+.zero-post {
+  font-size: 2rem;
+  text-align: center;
+  margin: 30px;
+  font-weight: 600;
+}
+
 .input_comment {
   height: 30px;
 }
@@ -205,6 +217,10 @@ function notification(title, type, duration) {
     font-size: 1rem;
     border: #131313 1px solid;
   }
+}
+
+.comment_plural {
+  margin-left: -3px;
 }
 
 .comment_edit_container {
@@ -246,6 +262,7 @@ function notification(title, type, duration) {
 .picture_post {
   max-width: 100%;
   object-fit: fill;
+  margin-top: 10px;
 }
 
 .card_form {
@@ -354,7 +371,7 @@ form {
   font-size: 1rem;
 
   p {
-    margin: 0 10px 10px 10px;
+    margin: 0 10px 0px 10px;
   }
 }
 

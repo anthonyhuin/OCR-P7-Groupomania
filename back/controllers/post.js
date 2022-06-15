@@ -14,10 +14,32 @@ exports.createPost = async (req, res) => {
 
   try {
     const post = await Post.create(data);
-    const user = await User.findOne({ attributes: ["firstName", "lastName", "profilePicture"], where: { id: req.user.id } });
-    data = { ...post.dataValues, ...user.dataValues, likeCount: 0, commentCount: 0, hasLiked: false, comments: [] };
+    const createdPost = await Post.findOne({
+      where: { id: post.id },
+      include: [
+        {
+          model: User,
+          attributes: ["firstName", "lastName", "id", "profilePicture"],
+        },
+        {
+          model: Like,
+          attributes: ["userId", "postId"],
+        },
+        {
+          model: Comment,
+          attributes: ["comment", "id", "createdAt"],
+          order: [["createdAt", "DESC"]],
+          include: [
+            {
+              model: User,
+              attributes: ["firstName", "lastName", "id", "profilePicture"],
+            },
+          ],
+        },
+      ],
+    });
 
-    res.status(201).json(data);
+    res.status(201).json(createdPost);
   } catch (error) {
     res.status(400).json(error);
   }
@@ -38,7 +60,7 @@ exports.getAllPosts = async (req, res) => {
         },
         {
           model: Comment,
-          attributes: ["comment", "active", "id", "createdAt"],
+          attributes: ["comment", "id", "createdAt"],
           order: [["createdAt", "DESC"]],
           include: [
             {
@@ -71,15 +93,14 @@ exports.deletePost = async (req, res) => {
 
       fs.unlink(`uploads/posts/${filename}`, async () => {
         await Post.destroy({ where: { id: req.params.id } });
-        //supprimer aussi les commentaires lié au post
         return res.status(200).send("message supprimé");
       });
     } else {
       await Post.destroy({ where: { id: req.params.id } });
-      //supprimer aussi les commentaires lié au post
       return res.status(200).send("message supprimé");
     }
   } catch (error) {
+    console.log(error);
     return res.status(401).send(error);
   }
 };
@@ -88,9 +109,14 @@ exports.editPost = async (req, res) => {
     const postUserId = await Post.findOne({ raw: true, attributes: ["userId"], where: { id: req.params.id } });
 
     if (req.user.id !== postUserId.userId) {
-      return res.status(400).send({
-        erreur: "Action non autorisée",
-      });
+      if (req.user.roles != "admin") {
+        return res.status(401).send({ erreur: "Action non autorisée" });
+      }
+    }
+    console.log(req.body.post.length);
+    if (req.body.post.length <= 1) {
+      return res.status(401).send({ erreur: "Veuillez renseigner ce champ" });
+    } else {
     }
 
     let postEdit = await Post.upsert({

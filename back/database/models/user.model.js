@@ -30,7 +30,7 @@ module.exports = (sequelize, DataTypes) => {
       bio: {
         type: DataTypes.TEXT,
       },
-      poste: {
+      job: {
         type: DataTypes.STRING,
       },
       location: {

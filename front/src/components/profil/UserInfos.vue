@@ -22,8 +22,6 @@ function notification(title, type, duration) {
 
 let editProfil = ref(false);
 let infoProfil = ref([]);
-let imageBanner = ref(null);
-let imageProfil = ref(null);
 
 if (route.params.id == "") {
   route.params.id = userStore.currentUser.id;
@@ -32,22 +30,27 @@ if (route.params.id == "") {
 watch(
   () => route.params.id,
   () => {
+
     getInfoProfil();
   }
 );
 
 function getInfoProfil() {
-  axios
-    .get(`/api/profil/${route.params.id}`)
-    .then(function (response) {
-      infoProfil.value = response.data;
-    })
-    .catch(function (error) {
-      infoProfil.value = error.response.data;
-    })
-    .then(function () { });
+  if (route.params.id !== undefined) {
+    axios
+      .get(`/api/profil/${route.params.id}`)
+      .then(function (response) {
+        infoProfil.value = response.data;
+      })
+      .catch(function (error) {
+        infoProfil.value = error.response.data;
+      })
+  }
 }
-getInfoProfil();
+
+
+
+
 
 function formatTime(time, method) {
   if (method == "birthdate") {
@@ -57,68 +60,6 @@ function formatTime(time, method) {
   }
 }
 
-function changeBanner(e) {
-  const regexImage = new RegExp("(image)[\/](gif|jpg|jpeg|png)");
-  imageBanner = e.target.files[0];
-  if (imageBanner != undefined) {
-    if (imageBanner.size > 1000000) {
-      imageBanner = null;
-      notification("Le fichier dépasse 1mo", "error");
-    } else {
-      if (regexImage.test(imageBanner.type)) {
-        let data = { picture: imageBanner };
-        axios
-          .post("/api/profil/upload/banner", data, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          })
-          .then((response) => {
-            userStore.currentUser.bannerPicture = response.data;
-            infoProfil.bannerPicture = response.data;
-          })
-          .catch((error) => {
-            notification(error.response.data.erreur, "error");
-          });
-      } else {
-        imageBanner = null;
-        notification("Format de fichier incompatabile", "error");
-      }
-    }
-  }
-}
-
-function changeProfilPicture(e) {
-  const regexImage = new RegExp("(image)[\/](gif|jpg|jpeg|png)");
-  imageProfil = e.target.files[0];
-
-  if (imageProfil != undefined) {
-    if (imageProfil.size > 1000000) {
-      imageProfil = null;
-      notification("Le fichier dépasse 1mo", "error");
-    } else {
-      if (regexImage.test(imageProfil.type)) {
-        let data = { picture: imageProfil };
-        axios
-          .post("/api/profil/upload/pp", data, {
-            headers: {
-              "Content-Type": "multipart/form-data",
-            },
-          })
-          .then((response) => {
-            userStore.currentUser.profilePicture = response.data;
-            infoProfil.profilePicture = response.data;
-          })
-          .catch((error) => {
-            notification(error.response.data.erreur, "error");
-          });
-      } else {
-        imageProfil = null;
-        notification("Format de fichier incompatabile", "error");
-      }
-    }
-  }
-}
 </script>
 
 <template>
@@ -129,30 +70,27 @@ function changeProfilPicture(e) {
     <div class="containter">
       <div class="card">
         <div class="card_background">
-          <input @change="changeBanner" type="file" name="picture" id="picture" class="inputfile"
-            accept="image/png, image/jpeg, image/jpg, image/gif" />
-          <label for="picture"> <img :src="userStore.currentUser.bannerPicture" alt="" class="background_img" /></label>
+          <img :src="userStore.currentUser.bannerPicture" alt="" class="background_img" />
           <div @click="editProfil = !editProfil" class="btn">Éditer le profil</div>
         </div>
 
         <div class="header_img">
-          <input @change="changeProfilPicture" type="file" name="profilpicture" id="profilpicture" class="inputfile"
-            accept="image/png, image/jpeg, image/jpg, image/gif" />
-          <label for="profilpicture" class="label_pp"><img :src="userStore.currentUser.profilePicture"
-              class="card_pp" /></label>
-
-          <span class="body_pseudo">{{ userStore.currentUser.firstName + " " + userStore.currentUser.lastName }}</span>
-          <span class="header_post">{{ userStore.currentUser.poste }}</span>
+          <img :src="userStore.currentUser.profilePicture" class="card_pp" />
+          <span class="body_pseudo">{{ userStore.currentUser.firstName }} {{ userStore.currentUser.lastName }}</span>
+          <span class="header_post" v-if="userStore.currentUser.job">{{ userStore.currentUser.job }}</span>
         </div>
 
         <div class="card_body">
           <p class="body_bio" v-if="userStore.currentUser.bio">{{ userStore.currentUser.bio }}</p>
         </div>
         <div class="card_footer">
-          <div class="body_birthday"><i class="fa-solid fa-location-dot"></i>{{ userStore.currentUser.location }}</div>
-          <div class="body_createdAt"><i class="fa-solid fa-cake-candles"></i>Naissance le {{
-              formatTime(userStore.currentUser.birthdate, "birthdate")
+          <div class="body_birthday" v-if="userStore.currentUser.location"><i class="fa-solid fa-location-dot"></i>{{
+              userStore.currentUser.location
           }}</div>
+          <div class="body_createdAt" v-if="userStore.currentUser.birthdate"><i
+              class="fa-solid fa-cake-candles"></i>Naissance le {{
+                  formatTime(userStore.currentUser.birthdate, "birthdate")
+              }}</div>
           <div class="body_birthday"><i class="fa-solid fa-calendar-days"></i>A rejoint Groupomania {{
               formatTime(userStore.currentUser.createdAt)
           }}</div>
@@ -170,8 +108,8 @@ function changeProfilPicture(e) {
 
         <div class="header_img">
           <div class="label_pp"><img :src="infoProfil.profilePicture" class="card_pp" /></div>
-          <span class="body_pseudo">{{ infoProfil.firstName + " " + infoProfil.lastName }}</span>
-          <span class="header_post">{{ infoProfil.poste }}</span>
+          <span class="body_pseudo">{{ infoProfil.firstName }} {{ infoProfil.lastName }}</span>
+          <span class="header_post">{{ infoProfil.job }}</span>
         </div>
 
         <div class="card_body">
@@ -260,14 +198,12 @@ function changeProfilPicture(e) {
 .card_pp {
   object-fit: cover;
   border-radius: 50%;
-}
-
-.label_pp {
-  border: 5px solid white;
-  border-radius: 50%;
   height: 130px;
   width: 130px;
+  border: 5px solid white;
 }
+
+
 
 /*/ /////////////////////////////////////////////////////////*/
 .card_body {
@@ -286,6 +222,10 @@ function changeProfilPicture(e) {
   position: relative;
   z-index: 0;
 }
+
+
+
+
 
 .card_footer {
   display: flex;

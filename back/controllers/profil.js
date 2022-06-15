@@ -6,48 +6,34 @@ const Comment = db.Comment;
 const fs = require("fs");
 exports.getPostProfil = async (req, res) => {
   try {
-    const post = await Post.findAll({ raw: true, order: [["id", "DESC"]], where: { userId: req.params.id, active: 1 } });
-
-    const postWithInfo = await Promise.all(
-      post.map(async (post) => {
-        const userInfos = await User.findOne({ attributes: ["id", "firstName", "lastName", "profilePicture"], where: { id: post.userId } });
-        const likeCount = await Like.count({ where: { postId: post.id } });
-        let hasLiked = await Like.findOne({ where: { postId: post.id, userId: req.user.id } });
-        if (hasLiked === null) {
-          hasLiked = false;
-        } else {
-          hasLiked = true;
-        }
-        const commentCount = await Comment.count({ where: { postId: post.id } });
-        const commentContent = await Comment.findAll({ raw: true, order: [["id", "DESC"]], where: { postId: post.id, active: 1 } });
-
-        const commentWithInfo = await Promise.all(
-          commentContent.map(async (comment) => {
-            const userInfos = await User.findOne({ attributes: ["id", "firstName", "lastName", "profilePicture"], where: { id: comment.userId, active: 1 } });
-            return {
-              ...comment,
-              firstName: userInfos.firstName,
-              lastName: userInfos.lastName,
-              profilePicture: userInfos.profilePicture,
-            };
-          })
-        );
-        return {
-          ...post,
-          firstName: userInfos.firstName,
-          lastName: userInfos.lastName,
-          profilePicture: userInfos.profilePicture,
-          likeCount: likeCount,
-          commentCount: commentCount,
-          hasLiked: hasLiked,
-          comments: commentWithInfo,
-        };
-      })
-    );
-
-    res.status(201).json(postWithInfo);
+    const posts = await Post.findAll({
+      where: { userId: req.params.id },
+      order: [["createdAt", "DESC"]],
+      include: [
+        {
+          model: User,
+          attributes: ["firstName", "lastName", "id", "profilePicture"],
+        },
+        {
+          model: Like,
+          attributes: ["userId", "postId"],
+        },
+        {
+          model: Comment,
+          attributes: ["comment", "id", "createdAt"],
+          order: [["createdAt", "DESC"]],
+          include: [
+            {
+              model: User,
+              attributes: ["firstName", "lastName", "id", "profilePicture"],
+            },
+          ],
+        },
+      ],
+    });
+    res.status(200).send(posts);
   } catch (e) {
-    res.status(403).json(e);
+    res.status(400).json(e);
   }
 };
 
@@ -59,13 +45,14 @@ exports.getInfoProfil = async (req, res) => {
     }
     res.status(201).json(user);
   } catch (e) {
-    res.status(403).json({ erreur: e });
+    console.log(e);
+    res.status(400).json({ erreur: e });
   }
 };
 
 exports.modifyProfil = async (req, res) => {
   try {
-    let user = await User.findOne({ where: { id: req.user.id } });
+    let user = await User.findOne({ attributes: { exclude: ["password"] }, where: { id: req.user.id } });
 
     user.set({
       bio: req.body.bio,
@@ -73,14 +60,14 @@ exports.modifyProfil = async (req, res) => {
       firstName: req.body.firstname,
       lastName: req.body.lastname,
       location: req.body.location,
-      poste: req.body.poste,
+      job: req.body.job,
     });
 
     user = await user.save();
 
     res.status(201).json(user);
   } catch (e) {
-    res.status(403).json({ erreur: e });
+    res.status(400).json({ erreur: e });
   }
 };
 exports.changeBanner = async (req, res) => {
@@ -99,7 +86,7 @@ exports.changeBanner = async (req, res) => {
       res.status(201).json(newBannerPicture[0].bannerPicture);
     });
   } catch (e) {
-    res.status(403).json({ erreur: e });
+    res.status(400).json({ erreur: e });
   }
 };
 
@@ -119,6 +106,6 @@ exports.changeProfilPicture = async (req, res) => {
       res.status(201).json(newprofilePicture[0].profilePicture);
     });
   } catch (e) {
-    res.status(403).json({ erreur: e });
+    res.status(400).json({ erreur: e });
   }
 };

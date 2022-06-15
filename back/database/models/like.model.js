@@ -1,5 +1,3 @@
-"use strict";
-
 const { Model } = require("sequelize");
 
 module.exports = (sequelize, DataTypes) => {
@@ -7,9 +5,11 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       models.Like.belongsTo(models.User, {
         foreignKey: "userId",
+        onDelete: "CASCADE",
       });
       models.Like.belongsTo(models.Post, {
         foreignKey: "postId",
+        onDelete: "CASCADE",
       });
     }
   }

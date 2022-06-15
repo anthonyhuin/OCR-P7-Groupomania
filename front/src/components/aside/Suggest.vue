@@ -37,7 +37,7 @@ getsuggestUsers();
 .suggest {
   background-color: var(--background-card);
   border: var(--border);
-  padding: var(--p-15);
+  padding: 15px;
   display: flex;
   flex-direction: column;
   box-shadow: var(--box-shadow);
@@ -52,7 +52,7 @@ getsuggestUsers();
   display: flex;
   align-items: center;
   gap: 10px;
-  padding: var(--p-10) 0 var(--p-10) 0;
+  padding: 10px 0 10px 0;
 }
 
 .form-button {
@@ -60,7 +60,7 @@ getsuggestUsers();
   justify-content: space-between;
   flex-direction: column;
   align-items: flex-start;
-  padding: var(--p-5);
+  padding: 5px;
 }
 
 h2 {

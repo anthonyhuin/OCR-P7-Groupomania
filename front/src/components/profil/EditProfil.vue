@@ -2,14 +2,16 @@
 import { notify } from "@kyvg/vue3-notification";
 import { z } from "zod";
 import { toFormValidator } from "@vee-validate/zod";
-import { useField, useForm, defineRule } from "vee-validate";
-import { useRouter } from "vue-router";
-import { createUser } from "@/shared/services/user.service";
+import { useField, useForm } from "vee-validate";
 import axios from "axios";
-import { useUser, usePost } from "@/shared/stores";
+import { useUser } from "@/shared/stores";
 import { useRoute } from "vue-router";
+import { ref, watch } from "vue";
 const route = useRoute();
 const userStore = useUser();
+let imageBanner = ref(null);
+let imageProfil = ref(null);
+let infoProfil = ref([]);
 
 const emit = defineEmits(["close"]);
 
@@ -17,10 +19,10 @@ const validationSchema = toFormValidator(
   z.object({
     firstname: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty().regex(new RegExp(/^\S*$/), "Le prénom ne doit pas contenir d'espace"),
     lastname: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty().regex(new RegExp(/^\S*$/), "Le nom ne doit pas contenir d'espace"),
-    birthday: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty(),
-    location: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty(),
-    poste: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty(),
-    bio: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty(),
+    birthday: z.string().optional().nullable(),
+    location: z.string().optional().nullable(),
+    job: z.string().optional().nullable(),
+    bio: z.string().optional().nullable(),
   })
 );
 
@@ -34,12 +36,11 @@ const submit = handleSubmit(async (formValue) => {
     axios
       .patch(`/api/profil/${route.params.id}`, body)
       .then((response) => {
-        console.log(response.data);
         userStore.currentUser.firstName = firstNameValue.value;
         userStore.currentUser.birthdate = birthdayValue.value;
         userStore.currentUser.lastName = lastNameValue.value;
         userStore.currentUser.location = locationValue.value;
-        userStore.currentUser.poste = posteValue.value;
+        userStore.currentUser.job = jobValue.value;
         userStore.currentUser.bio = bioValue.value;
         notify({
           type: "success",
@@ -63,50 +64,148 @@ const { value: firstNameValue, errorMessage: firstNameError } = useField("firstn
 const { value: lastNameValue, errorMessage: lastNameError } = useField("lastname");
 const { value: birthdayValue, errorMessage: birthdayError } = useField("birthday");
 const { value: locationValue, errorMessage: locationError } = useField("location");
-const { value: posteValue, errorMessage: posteError } = useField("poste");
+const { value: jobValue, errorMessage: jobError } = useField("job");
 const { value: bioValue, errorMessage: bioError } = useField("bio");
 
 firstNameValue.value = userStore.currentUser.firstName;
 birthdayValue.value = userStore.currentUser.birthdate;
 lastNameValue.value = userStore.currentUser.lastName;
 locationValue.value = userStore.currentUser.location;
-posteValue.value = userStore.currentUser.poste;
+jobValue.value = userStore.currentUser.job;
 bioValue.value = userStore.currentUser.bio;
+
+function notification(title, type, duration) {
+  notify({
+    duration: duration ? duration : 4000,
+    type: type ? type : "info",
+    title: title,
+  });
+}
+function changeBanner(e) {
+  const regexImage = new RegExp("(image)[\/](gif|jpg|jpeg|png)");
+  imageBanner = e.target.files[0];
+  if (imageBanner != undefined) {
+    if (imageBanner.size > 1000000) {
+      imageBanner = null;
+      notification("Le fichier dépasse 1mo", "error");
+    } else {
+      if (regexImage.test(imageBanner.type)) {
+        let data = { picture: imageBanner };
+        axios
+          .post("/api/profil/upload/banner", data, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then((response) => {
+            userStore.currentUser.bannerPicture = response.data;
+            infoProfil.bannerPicture = response.data;
+            notification("Bannière modifiée", "success");
+          })
+          .catch((error) => {
+            notification(error.response.data.erreur, "error");
+          });
+      } else {
+        imageBanner = null;
+        notification("Format de fichier incompatabile", "error");
+      }
+    }
+  }
+}
+
+function changeProfilPicture(e) {
+  const regexImage = new RegExp("(image)[\/](gif|jpg|jpeg|png)");
+  imageProfil = e.target.files[0];
+
+  if (imageProfil != undefined) {
+    if (imageProfil.size > 1000000) {
+      imageProfil = null;
+      notification("Le fichier dépasse 1mo", "error");
+    } else {
+      if (regexImage.test(imageProfil.type)) {
+        let data = { picture: imageProfil };
+        axios
+          .post("/api/profil/upload/pp", data, {
+            headers: {
+              "Content-Type": "multipart/form-data",
+            },
+          })
+          .then((response) => {
+            userStore.currentUser.profilePicture = response.data;
+            infoProfil.profilePicture = response.data;
+            notification("Image de profil modifiée", "success");
+          })
+          .catch((error) => {
+            console.log(error);
+            notification(error.response.data.erreur, "error");
+          });
+      } else {
+        imageProfil = null;
+        notification("Format de fichier incompatabile", "error");
+      }
+    }
+  }
+}
+
+
+
 </script>
 <template>
   <div class="edit_container" @click="$emit('close')">
     <div v-on:click.stop class="edit_profil">
+
+
+      <div class="edit_image">
+        <input @change="changeBanner" type="file" name="picture" id="picture" class="inputfile"
+          accept="image/png, image/jpeg, image/jpg, image/gif" />
+        <label for="picture" class="label_background"
+          :style="{ backgroundImage: `url(${userStore.currentUser.bannerPicture})` }">
+          <div class="tesssst1"></div>
+
+          <i class="fa-solid fa-image icon_banner"></i>
+        </label>
+        <input @change="changeProfilPicture" type="file" name="picturepp" id="picturepp" class="inputfile"
+          accept="image/png, image/jpeg, image/jpg, image/gif" />
+        <label for="picturepp" class="label_picturepp"
+          :style="{ backgroundImage: `url(${userStore.currentUser.profilePicture})` }">
+          <div class="tesssst2"></div>
+          <i class="fa-solid fa-image icon_pp"></i>
+        </label>
+
+      </div>
+
+
       <form @submit.prevent="submit">
         <div class="form">
           <div class="field name-input">
             <label class="label" for="username">Prénom</label>
-            <input v-model="firstNameValue" type="text" class="input username" name="username" id="firstname" />
+            <input v-model.trim="firstNameValue" type="text" class="input username" name="username" id="firstname" />
             <p v-if="firstNameError" class="field-error">{{ firstNameError }}</p>
           </div>
           <div class="field name-input">
             <label class="label" for="username">Nom</label>
-            <input v-model="lastNameValue" type="text" class="input username" name="username" id="lastname" />
+            <input v-model.trim="lastNameValue" type="text" class="input username" name="username" id="lastname" />
             <p v-if="lastNameError" class="field-error">{{ lastNameError }}</p>
           </div>
           <div class="field birthday-input">
             <label class="label" for="birthday">Date de naissance</label>
-            <input v-model="birthdayValue" type="date" class="input birthday" name="birthday" id="birthday" />
+            <input v-model.trim="birthdayValue" type="date" class="input birthday" name="birthday" id="birthday" />
             <p v-if="birthdayError" class="field-error">{{ birthdayError }}</p>
           </div>
           <div class="field name-input">
             <label class="label" for="username">Localisation</label>
-            <input v-model="locationValue" type="text" class="input username" name="username" id="location" />
+            <input v-model.trim="locationValue" type="text" class="input username" name="username" id="location" />
             <p v-if="locationError" class="field-error">{{ locationError }}</p>
           </div>
           <div class="field name-input">
             <label class="label" for="username">Poste</label>
-            <input v-model="posteValue" type="text" class="input username" name="username" id="poste" />
-            <p v-if="posteError" class="field-error">{{ posteError }}</p>
+            <input v-model.trim="jobValue" type="text" class="input username" name="username" id="job" />
+            <p v-if="jobError" class="field-error">{{ jobError }}</p>
           </div>
         </div>
         <div class="field name-input">
           <label class="label" for="username">Bio</label>
-          <textarea v-model="bioValue" type="text" name="username" id="bio" />
+          <textarea v-model.trim="bioValue" type="text" name="username" id="bio" />
           <p v-if="bioError" class="field-error">{{ bioError }}</p>
         </div>
         <div class="form-controls">
@@ -118,6 +217,111 @@ bioValue.value = userStore.currentUser.bio;
   </div>
 </template>
 <style lang="scss" scoped>
+.tesssst1 {
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  transition: 0.2s;
+}
+
+.tesssst2 {
+  border-radius: 50%;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  transition: 0.2s;
+}
+
+
+
+.edit_image {
+  position: relative;
+  margin: 0 -20px 0 -20px;
+
+}
+
+.label_background {
+  background-color: rgba(0, 0, 0, 0.3);
+  display: block;
+  height: 200px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+  position: relative;
+
+  .icon_banner {
+    border-radius: 50%;
+    backdrop-filter: blur(4px);
+    background-color: var(--icon-edit);
+    padding: 10px;
+    color: var(--white);
+    position: absolute;
+    top: 25%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &:hover .tesssst1 {
+
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.label_picturepp {
+  position: relative;
+  border: 5px solid white;
+  position: absolute;
+  right: 50%;
+  top: 100px;
+  transform: translateX(50%);
+  border-radius: 50%;
+  display: block;
+  width: 125px;
+  height: 125px;
+  background-repeat: no-repeat;
+  background-size: cover;
+  background-position: center;
+
+  .icon_pp {
+    border-radius: 50%;
+    backdrop-filter: blur(4px);
+    background-color: var(--icon-edit);
+    padding: 10px;
+    color: var(--white);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+
+  &:hover .tesssst2 {
+
+    background-color: rgba(0, 0, 0, 0.6);
+  }
+}
+
+.inputfile {
+  width: 0.1px;
+  height: 0.1px;
+  opacity: 0;
+  overflow: hidden;
+  position: absolute;
+  z-index: -1;
+}
+
+.inputfile+label {
+  cursor: pointer;
+  /* "hand" cursor */
+}
+
+
+
+
+
+
+
+
+////////////////////////////////
 .edit_container {
   position: fixed;
   inset: 0;
@@ -128,20 +332,22 @@ bioValue.value = userStore.currentUser.bio;
   align-items: center;
   z-index: 100;
 }
+
 .field-error {
   padding-top: 5px;
   font-weight: 600;
   font-size: 0.8rem;
   color: var(--danger-1);
 }
+
 .edit_profil {
   background-color: var(--background-card);
   display: flex;
   flex-direction: column;
-  padding: 10px;
   box-shadow: var(--box-shadow);
   border-radius: var(--border-radius);
-  min-width: 300px;
+  min-width: 500px;
+  overflow: hidden;
   padding: 0 20px;
 }
 
@@ -174,6 +380,7 @@ textarea {
     border-color: var(--primary-1);
   }
 }
+
 textarea {
   height: 70px;
 }
@@ -209,14 +416,17 @@ textarea {
     color: black;
     border: 1px solid #dcdcdc;
     background-color: white;
+
     &:hover {
       background-color: var(--gray-1);
     }
   }
 }
+
 .disabled {
   background-color: #dcdcdc;
 }
+
 .birthday {
   font-family: var(--font-family);
 }

@@ -5,6 +5,7 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       models.Post.belongsTo(models.User, {
         foreignKey: "userId",
+        onDelete: "CASCADE",
       });
       models.Post.hasMany(models.Like, { foreignKey: "postId" });
       models.Post.hasMany(models.Comment, { foreignKey: "postId" });
@@ -23,10 +24,6 @@ module.exports = (sequelize, DataTypes) => {
       picture: {
         type: DataTypes.STRING,
       },
-      active: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: true,
-      },
 
       editPost: {
         type: DataTypes.VIRTUAL,
@@ -38,24 +35,6 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.VIRTUAL,
         get() {
           return false;
-        },
-      },
-      hasLiked: {
-        type: DataTypes.VIRTUAL,
-        get() {
-          return false;
-        },
-      },
-      commentCount: {
-        type: DataTypes.VIRTUAL,
-        get() {
-          return 5;
-        },
-      },
-      likeCount: {
-        type: DataTypes.VIRTUAL,
-        get() {
-          return 5;
         },
       },
     },

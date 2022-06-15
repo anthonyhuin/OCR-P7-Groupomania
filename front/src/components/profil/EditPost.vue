@@ -4,11 +4,11 @@ import { number, z } from "zod";
 import { toFormValidator } from "@vee-validate/zod";
 import { useField, useForm } from "vee-validate";
 import axios from "axios";
-import { useUser, usePost } from "@/shared/stores";
+import { useUser, usePost, useProfil } from "@/shared/stores";
 import { useRoute } from "vue-router";
 const route = useRoute();
 const userStore = useUser();
-const postStore = usePost();
+const profilStore = useProfil();
 let props = defineProps({
   postId: Number,
   post: String,
@@ -29,18 +29,18 @@ const submit = handleSubmit(async (formValue) => {
     axios
       .patch(`/api/post/${props.postId}`, formValue)
       .then((response) => {
-        postStore.posts[props.index].post = response.data;
-        postStore.posts[props.index].editPost = false;
+        profilStore.posts[props.index].post = response.data;
+        profilStore.posts[props.index].editPost = false;
         notify({
           type: "success",
           title: "Post modifié",
         });
       })
       .catch((error) => {
-        console.log(error.response.data.erreur);
+        console.log(error);
         notify({
           type: "error",
-          title: error.response.data.erreur,
+          title: error,
         });
       });
   } catch (e) {
@@ -60,12 +60,12 @@ postValue.value = props.post;
           <div class="field name-input">
             <label class="label" for="post">Modifier le post</label>
 
-            <resize-textarea name="post" id="post" :rows="2" :cols="4" :maxHeight="500" v-model.trim="postValue">
+            <resize-textarea name="post" id="post" :rows="2" :cols="4" :maxHeight="500" v-model="postValue">
             </resize-textarea>
             <p v-if="postError" class="field-error">{{ postError }}</p>
           </div>
           <div class="form-controls">
-            <button class="btn cancel" @click="postStore.posts[props.index].editPost = false">Annuler</button>
+            <button class="btn cancel" @click="profilStore.posts[props.index].editPost = false">Annuler</button>
             <button class="btn submit">Enregistrer</button>
           </div>
         </div>
