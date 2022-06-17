@@ -1,73 +1,70 @@
 <script setup>
-import { z } from "zod";
-import { toFormValidator } from "@vee-validate/zod";
-import { useField, useForm } from "vee-validate";
-import { useRouter } from "vue-router";
 import { useUser, usePost } from "@/shared/stores";
 import axios from "axios";
 import { ref } from "vue";
 const userStore = useUser();
 const postStore = usePost();
-const router = useRouter();
 
-let imagePost = ref(null);
-let imagePreview = ref(null);
-let inputfile = ref(null);
+const imagePost = ref(null);
+const imagePreview = ref(null);
+const postValue = ref('')
+const postError = ref('')
+const inputfile = ref(null)
 
-const validationSchema = toFormValidator(
-  z.object({
-    post: z.string({ required_error: "Veuillez renseigner ce champ" }).max(500, "Le post doit faire moins de 500 caractères").min(1, "Le post doit faire plus de 1 caractère"),
-  })
-);
-
-function onChange(e) {
+function uploadImage(e) {
   const regexImage = new RegExp("(image)[\/](gif|jpg|jpeg|png)");
-  imagePost = e.target.files[0];
-  if (e.target.files[0].size > 1000000) {
-    imagePost = null;
-    setErrors({ post: "Le fichier dépasse 1moo" });
-  } else {
-    if (regexImage.test(imagePost.type)) {
-      imagePreview.value = URL.createObjectURL(imagePost);
-      setErrors({ post: "" });
+  imagePost.value = e.target.files[0];
+  if (imagePost.value != null) {
+    if (imagePost.value.size > 1000000) {
+      imagePost.value = null;
+      postError.value = "Le fichier dépasse 1mo";
     } else {
-      imagePost = null;
-      setErrors({ post: "Format de fichier incompatabile" });
+      if (regexImage.test(imagePost.value.type)) {
+        imagePreview.value = URL.createObjectURL(imagePost.value);
+        postError.value = ""
+      } else {
+        imagePost.value = null;
+        postError.value = "Format de fichier incompatible";
+      }
     }
   }
+
 }
 
 function resetImageInput() {
-  imagePost = null;
-  imagePreview.value = "";
+  inputfile.value = null;
+  imagePost.value = null;
+  imagePreview.value = null;
+
+
 }
 
-const { handleSubmit, setErrors } = useForm({
-  validationSchema,
-});
+function submit() {
+  if (postValue.value.length > 0 || imagePost.value != null) {
+    if (postValue.value.length > 500) {
+      return postError.value = "Le post doit faire moins de 500 caractères"
+    }
+    let data = { "post": postValue.value, "picture": imagePost.value, }
+    axios.post("/api/post", data, { headers: { "Content-Type": "multipart/form-data", }, })
+      .then((response) => {
+        postStore.posts.splice(0, 0, response.data);
+        imagePost.value = null;
+        inputfile.value = null
+        imagePreview.value = null;
+        postValue.value = "";
+        postError.value = ""
+      })
+      .catch((error) => {
+        postError.value = error.response.data.erreur
+      });
+  } else {
+    postError.value = "Veuillez renseigner au moins un champ"
+  }
+};
 
-const submit = handleSubmit((formValue) => {
-  formValue["picture"] = imagePost;
 
-  axios
-    .post("/api/post", formValue, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
-    })
-    .then((response) => {
-      postStore.posts.splice(0, 0, response.data);
-      imagePost = null;
-      imagePreview.value = undefined;
-      postValue.value = "";
-      setErrors({ post: "" });
-    })
-    .catch((error) => {
-      setErrors({ post: error.response.data.erreur });
-    });
-});
 
-const { value: postValue, errorMessage: postError } = useField("post");
+
 </script>
 
 <template>
@@ -81,16 +78,20 @@ const { value: postValue, errorMessage: postError } = useField("post");
 
       <div class="form-button">
         <div class="icon_form">
-          <input @change="onChange" type="file" name="picture" id="picture" class="inputfile" ref="inputfile"
+          <input @change="uploadImage" type="file" name="picture" id="picture" class="inputfile" ref="inputfile"
             accept="image/png, image/jpeg, image/jpg, image/gif" />
           <label for="picture"><i class="fa-solid fa-image"></i></label>
 
-          <i class="fa-solid fa-face-grin-wide"></i>
+
         </div>
         <p v-if="postError" class="form-error">{{ postError }}</p>
-        <button class="btn">
-          <span>Publier</span>
-        </button>
+        <div class="right_bloc">
+          <div v-if="postValue" class="progressbar"></div>
+          <button class="btn">
+            <span>Publier</span>
+          </button>
+        </div>
+
       </div>
       <div v-if="imagePreview" class="form_preview">
         <span @click="resetImageInput" class="preview_reset"><i class="fa-solid fa-xmark"></i></span>
@@ -101,6 +102,25 @@ const { value: postValue, errorMessage: postError } = useField("post");
 </template>
 
 <style lang="scss" scoped>
+.progressbar {
+  --percentage: v-bind(postValue.length);
+
+  width: 1.3rem;
+  height: 1.3rem;
+  border-radius: 50%;
+  background:
+    radial-gradient(closest-side, white 80%, transparent 0 99.9%),
+    conic-gradient(var(--primary-1) calc(var(--percentage) * 0.2%), var(--gray-1) 0);
+
+}
+
+///////////////////////////////
+.right_bloc {
+  display: flex;
+  gap: 15px;
+  align-items: center;
+}
+
 .form_preview {
   position: relative;
 
@@ -173,7 +193,7 @@ form {
   display: flex;
   justify-content: space-between;
   width: 100%;
-  padding-left: 50px;
+  padding-left: 59px;
   align-items: center;
 }
 

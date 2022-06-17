@@ -13,15 +13,14 @@ dist
 dist-ssr
 coverage
 *.local
-/keys/jwtRS256.key
-/keys/jwtRS256.key.pub
+# /keys/jwtRS256.key
+# /keys/jwtRS256.key.pub
 /cypress/videos/
 /cypress/screenshots/
 /uploads/banner/*
 /uploads/profil/*
 /uploads/posts/*
 
-# Editor directories and files
 .vscode/*
 !.vscode/extensions.json
 .idea

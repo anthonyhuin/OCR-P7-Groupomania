@@ -1,10 +1,7 @@
 const bcrypt = require("bcrypt");
 const jsonwebtoken = require("jsonwebtoken");
 const db = require("../database/models");
-const Post = db.Post;
 const User = db.User;
-const Like = db.Like;
-const Comment = db.Comment;
 const { key } = require("../keys");
 
 exports.login = async (req, res) => {
@@ -12,7 +9,7 @@ exports.login = async (req, res) => {
   const user = await User.findOne({ raw: true, where: { email: body.email } });
 
   if (user === null) {
-    res.status(400).json("Mauvais email ou mot de passe");
+    res.status(401).json("Mauvais email ou mot de passe");
   } else {
     if (user.active == 0) {
       return res.status(400).json("Compte désactivé");
@@ -33,7 +30,7 @@ exports.login = async (req, res) => {
 
       res.json(user);
     } else {
-      res.status(400).json("Mauvais email ou mot de passe");
+      res.status(401).json("Mauvais email ou mot de passe");
     }
   }
 };

@@ -1,5 +1,3 @@
-<script setup></script>
-
 <template>
 
   <div class="body">
@@ -12,8 +10,6 @@
 
 <style scoped>
 @import url(https://fonts.googleapis.com/css?family=Roboto:400,100,300,500);
-
-
 
 .body {
   display: flex;

@@ -9,9 +9,9 @@ import { useRoute } from "vue-router";
 import { ref, watch } from "vue";
 const route = useRoute();
 const userStore = useUser();
-let imageBanner = ref(null);
-let imageProfil = ref(null);
-let infoProfil = ref([]);
+const imageBanner = ref(null);
+const imageProfil = ref(null);
+const infoProfil = ref([]);
 
 const emit = defineEmits(["close"]);
 
@@ -83,14 +83,14 @@ function notification(title, type, duration) {
 }
 function changeBanner(e) {
   const regexImage = new RegExp("(image)[\/](gif|jpg|jpeg|png)");
-  imageBanner = e.target.files[0];
-  if (imageBanner != undefined) {
-    if (imageBanner.size > 1000000) {
-      imageBanner = null;
+  imageBanner.value = e.target.files[0];
+  if (imageBanner.value != undefined) {
+    if (imageBanner.value.size > 1000000) {
+      imageBanner.value = null;
       notification("Le fichier dépasse 1mo", "error");
     } else {
-      if (regexImage.test(imageBanner.type)) {
-        let data = { picture: imageBanner };
+      if (regexImage.test(imageBanner.value.type)) {
+        let data = { picture: imageBanner.value };
         axios
           .post("/api/profil/upload/banner", data, {
             headers: {
@@ -106,8 +106,8 @@ function changeBanner(e) {
             notification(error.response.data.erreur, "error");
           });
       } else {
-        imageBanner = null;
-        notification("Format de fichier incompatabile", "error");
+        imageBanner.value = null;
+        notification("Format de fichier incompatible", "error");
       }
     }
   }
@@ -115,15 +115,15 @@ function changeBanner(e) {
 
 function changeProfilPicture(e) {
   const regexImage = new RegExp("(image)[\/](gif|jpg|jpeg|png)");
-  imageProfil = e.target.files[0];
+  imageProfil.value = e.target.files[0];
 
-  if (imageProfil != undefined) {
-    if (imageProfil.size > 1000000) {
-      imageProfil = null;
+  if (imageProfil.value != undefined) {
+    if (imageProfil.value.size > 1000000) {
+      imageProfil.value = null;
       notification("Le fichier dépasse 1mo", "error");
     } else {
-      if (regexImage.test(imageProfil.type)) {
-        let data = { picture: imageProfil };
+      if (regexImage.test(imageProfil.value.type)) {
+        let data = { picture: imageProfil.value };
         axios
           .post("/api/profil/upload/pp", data, {
             headers: {
@@ -140,8 +140,8 @@ function changeProfilPicture(e) {
             notification(error.response.data.erreur, "error");
           });
       } else {
-        imageProfil = null;
-        notification("Format de fichier incompatabile", "error");
+        imageProfil.value = null;
+        notification("Format de fichier incompatible", "error");
       }
     }
   }
@@ -429,5 +429,15 @@ textarea {
 
 .birthday {
   font-family: var(--font-family);
+}
+
+@media only screen and (max-width: 800px) {
+
+  .edit_profil {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 200px;
+  }
+
 }
 </style>

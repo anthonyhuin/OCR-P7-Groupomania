@@ -1,6 +1,6 @@
 <script setup>
 import { notify } from "@kyvg/vue3-notification";
-import { number, z } from "zod";
+import { z } from "zod";
 import { toFormValidator } from "@vee-validate/zod";
 import { useField, useForm } from "vee-validate";
 import axios from "axios";
@@ -9,7 +9,7 @@ import { useRoute } from "vue-router";
 const route = useRoute();
 const userStore = useUser();
 const postStore = usePost();
-let props = defineProps({
+const props = defineProps({
   postId: Number,
   post: String,
   index: Number,
@@ -25,10 +25,13 @@ const { handleSubmit, setErrors } = useForm({
 });
 
 const submit = handleSubmit(async (formValue) => {
+  console.log(formValue);
   try {
     axios
       .patch(`/api/post/${props.postId}`, formValue)
       .then((response) => {
+        console.log(postStore.posts[props.index].post);
+        console.log(response.data);
         postStore.posts[props.index].post = response.data;
         postStore.posts[props.index].editPost = false;
         notify({
@@ -53,7 +56,7 @@ const { value: postValue, errorMessage: postError } = useField("post");
 postValue.value = props.post;
 </script>
 <template>
-  <div class="edit_container" @click="">
+  <div class="edit_container" @click="postStore.posts[props.index].editPost = false">
     <div v-on:click.stop class="edit_profil">
       <form @submit.prevent="submit">
         <div class="form">

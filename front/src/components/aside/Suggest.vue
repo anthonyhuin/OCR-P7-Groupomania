@@ -2,7 +2,7 @@
 import axios from "axios";
 import { ref } from "vue";
 
-let suggetsUsers = ref([]);
+const suggetsUsers = ref([]);
 function getsuggestUsers() {
   axios
     .get("/api/user/suggest")

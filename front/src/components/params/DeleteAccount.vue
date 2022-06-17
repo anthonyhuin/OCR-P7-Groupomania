@@ -1,14 +1,12 @@
 <script setup>
 import axios from "axios";
-import { useRouter } from "vue-router";
 import { notify } from "@kyvg/vue3-notification";
 import { useUser } from "@/shared/stores";
 import { ref } from "vue";
-const userStore = useUser();
-const router = useRouter();
-const emit = defineEmits(["logout"]);
 
-let confirmDisable = ref(false);
+const userStore = useUser();
+const emit = defineEmits(["logout"]);
+const confirmDisable = ref(false);
 
 function disableAccount() {
   axios
@@ -29,8 +27,6 @@ function disableAccount() {
       });
     });
 }
-
-const { firstNameError, firstNameValue } = "bonjour";
 </script>
 
 <template>
@@ -54,45 +50,6 @@ const { firstNameError, firstNameValue } = "bonjour";
 </template>
 
 <style lang="scss" scoped>
-.field-error {
-  padding-top: 5px;
-  font-weight: 600;
-  font-size: 0.8rem;
-  color: var(--danger-1);
-}
-
-.field {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 15px;
-}
-
-.input {
-  height: 40px;
-  border: 1px solid #dcdcdc;
-  border-radius: 6px;
-  font-family: var(--font-family);
-  font-size: 16px;
-  padding-left: 10px;
-  font-weight: 500;
-  color: var(--text-color);
-  appearance: none;
-  outline: none;
-  caret-color: var(--primary-1);
-  background: #ffffff;
-
-  &:focus {
-    border-color: var(--primary-1);
-  }
-}
-
-.label {
-  color: var(--text-color);
-  font-weight: 500;
-  font-size: 1rem;
-  margin-bottom: 7px;
-}
-
 .form-controls {
   display: flex;
   width: 100%;

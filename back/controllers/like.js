@@ -1,8 +1,5 @@
 const db = require("../database/models");
-const Post = db.Post;
-const User = db.User;
 const Like = db.Like;
-const Comment = db.Comment;
 
 exports.setLike = async (req, res) => {
   let data = {

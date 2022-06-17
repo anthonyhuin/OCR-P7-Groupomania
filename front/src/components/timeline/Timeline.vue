@@ -1,7 +1,7 @@
 <script setup>
 import PostForm from "./PostForm.vue";
 import PostList from "./PostList.vue";
-import { usePost, useUser } from "@/shared/stores";
+import { usePost } from "@/shared/stores";
 
 const postStore = usePost();
 </script>
@@ -16,4 +16,4 @@ const postStore = usePost();
   </div>
 </template>
 
-<style scoped></style>
+

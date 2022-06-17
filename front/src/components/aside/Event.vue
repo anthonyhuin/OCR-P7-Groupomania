@@ -2,7 +2,7 @@
 import axios from "axios";
 import { ref } from "vue";
 
-let birthdateUsers = ref([]);
+const birthdateUsers = ref([]);
 function getsuggestUsers() {
   axios
     .get("/api/user/findbirthday")
@@ -23,7 +23,7 @@ getsuggestUsers();
 <template >
   <div v-if="birthdateUsers != null" class="event">
     <img src="@/assets/images/ballon.png" class="background" alt="background" />
-    <img :src="birthdateUsers.profilePicture" class="profil_pic" alt="" />
+    <img :src="birthdateUsers.profilePicture" class="profil_pic" alt="Photo de profil" />
     <h4>C'est l'anniversaire de {{ birthdateUsers.firstName }} ! 🍰</h4>
     <p>Laissez-lui un message avec vos meilleurs vœux !</p>
   </div>

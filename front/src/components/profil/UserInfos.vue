@@ -1,27 +1,17 @@
 <script setup>
 import axios from "axios";
-import { usePost, useUser, useProfil } from "@/shared/stores";
+import { useUser, useProfil } from "@/shared/stores";
 import EditProfil from "./EditProfil.vue";
 import { useRoute } from "vue-router";
 import { ref, watch } from "vue";
 import moment from "moment";
 import "moment/dist/locale/fr";
-import { notify } from "@kyvg/vue3-notification";
-const postStore = usePost();
+
 const userStore = useUser();
 const profilStore = useProfil();
 const route = useRoute();
-
-function notification(title, type, duration) {
-  notify({
-    duration: duration ? duration : 4000,
-    type: type ? type : "info",
-    title: title,
-  });
-}
-
-let editProfil = ref(false);
-let infoProfil = ref([]);
+const editProfil = ref(false);
+const infoProfil = ref([]);
 
 if (route.params.id == "") {
   route.params.id = userStore.currentUser.id;
@@ -30,7 +20,6 @@ if (route.params.id == "") {
 watch(
   () => route.params.id,
   () => {
-
     getInfoProfil();
   }
 );
@@ -47,9 +36,6 @@ function getInfoProfil() {
       })
   }
 }
-
-
-
 
 
 function formatTime(time, method) {

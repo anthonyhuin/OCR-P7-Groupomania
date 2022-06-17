@@ -8,6 +8,5 @@ router.get("/post/:id", auth, profilControllers.getPostProfil);
 router.post("/upload/banner", auth, upload, profilControllers.changeBanner);
 router.post("/upload/pp", auth, upload, profilControllers.changeProfilPicture);
 router.patch("/:id", auth, profilControllers.modifyProfil);
-//router.get("/getlike/:id", likeControllers.getLike);
 
 module.exports = router;

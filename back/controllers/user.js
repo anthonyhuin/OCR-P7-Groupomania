@@ -77,7 +77,7 @@ exports.disableAccount = async (req, res) => {
     await Comment.destroy({ where: { userId: req.user.id } });
     await Post.destroy({ where: { userId: req.user.id } });
 
-    res.status(200).json("ok");
+    res.status(200).json("Compte désactivé");
   } catch (e) {
     res.status(400).json({ erreur: e });
   }
@@ -115,7 +115,6 @@ exports.findBirthday = async (req, res) => {
       users.map(async (user) => {
         if (user.birthdate !== null) {
           let birthdate = user.birthdate.split("-");
-
           if (birthdate[1] - month == 0 && birthdate[2] - day == 0) {
             return (dataBirthdate = user);
           }
@@ -125,7 +124,6 @@ exports.findBirthday = async (req, res) => {
 
     res.status(200).json(dataBirthdate);
   } catch (e) {
-    console.log(e);
     res.status(400).json({ erreur: e });
   }
 };

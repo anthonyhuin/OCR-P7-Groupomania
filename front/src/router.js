@@ -46,7 +46,7 @@ export const router = createRouter({
 
 router.beforeEach(async () => {
   const userStore = useUser();
-  if (!userStore.loaded) {
+  if (!userStore.isLoggedIn) {
     await userStore.CurrentUser();
   }
 });

@@ -4,13 +4,13 @@ import { fetchCurrentUser, login, logout } from "../services";
 export const useUser = defineStore("user", {
   state: () => ({
     currentUser: null,
-    loaded: false,
+    isLoggedIn: false,
   }),
   getters: {
     isAuthenticated(state) {
       if (state.currentUser) {
         return true;
-      } else if (!state.currentUser && state.loaded) {
+      } else if (!state.currentUser && state.isLoggedIn) {
         return false;
       } else {
         return null;
@@ -31,7 +31,7 @@ export const useUser = defineStore("user", {
     },
     async CurrentUser() {
       this.currentUser = await fetchCurrentUser();
-      this.loaded = true;
+      this.isLoggedIn = true;
     },
   },
 });

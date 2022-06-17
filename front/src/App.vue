@@ -1,5 +1,3 @@
-<script setup></script>
-
 <template>
   <router-view> </router-view>
   <notifications position="bottom right" />
@@ -9,7 +7,6 @@
 @import "@/assets/style/base.scss";
 
 .vue-notification {
-  // styling
   margin: 0 5px 5px;
   padding: 10px;
   font-size: 1rem !important;

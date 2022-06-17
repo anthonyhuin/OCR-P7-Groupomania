@@ -3,8 +3,6 @@ require("dotenv").config();
 const app = express();
 const path = require("path");
 const cookieParser = require("cookie-parser");
-const port = "8000";
-const cors = require("cors");
 require("./database/models");
 
 //import routes

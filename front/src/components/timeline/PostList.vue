@@ -118,7 +118,8 @@ function displayOptionBtn(postUserId) {
 
     <article class="card" v-for="(post, index) in postStore.posts">
       <div class="card_header">
-        <div class="header_pp"><img :src="post.User.profilePicture" class="fake_pp" /></div>
+        <div class="header_pp"><img :alt="`Photo de profil de ${post.User.firstName + ' ' + post.User.firstName}`"
+            :src="post.User.profilePicture" class="fake_pp" /></div>
 
         <div class="header_info">
           <router-link :to="'/profil/' + post.User.id" class="menu_link">

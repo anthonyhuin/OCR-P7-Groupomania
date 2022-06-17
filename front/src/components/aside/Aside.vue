@@ -12,4 +12,3 @@ import Footer from "./Footer.vue";
   </aside>
 </template>
 
-<style type="scss" scoped></style>

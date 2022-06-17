@@ -1,22 +1,22 @@
 <script setup>
 import { notify } from "@kyvg/vue3-notification";
-import { number, z } from "zod";
+import { z } from "zod";
 import { toFormValidator } from "@vee-validate/zod";
 import { useField, useForm } from "vee-validate";
 import axios from "axios";
-import { useUser, usePost, useProfil } from "@/shared/stores";
-import { useRoute } from "vue-router";
-const route = useRoute();
-const userStore = useUser();
+import { useProfil } from "@/shared/stores";
+
 const profilStore = useProfil();
+
 let props = defineProps({
   postId: Number,
   post: String,
   index: Number,
 });
+
 const validationSchema = toFormValidator(
   z.object({
-    post: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty(),
+    post: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty().max(500, "Le post doit faire moins de 500 caractères"),
   })
 );
 
@@ -53,7 +53,7 @@ const { value: postValue, errorMessage: postError } = useField("post");
 postValue.value = props.post;
 </script>
 <template>
-  <div class="edit_container" @click="">
+  <div class="edit_container" @click="profilStore.posts[props.index].editPost = false">
     <div v-on:click.stop class="edit_profil">
       <form @submit.prevent="submit">
         <div class="form">

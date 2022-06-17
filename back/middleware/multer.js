@@ -37,7 +37,7 @@ module.exports = async (req, res, next) => {
       if (err.message.includes("File too large")) return res.status(500).json({ erreur: "Le fichier dépasse 1mo" });
       return res.status(500).json(err);
     } else if (err) {
-      if (err.message.includes("Format incorrect")) return res.status(500).json({ erreur: "Format de fichier incompatabile" });
+      if (err.message.includes("Format incorrect")) return res.status(500).json({ erreur: "Format de fichier incompatible" });
       return res.status(500).json(err);
     }
 

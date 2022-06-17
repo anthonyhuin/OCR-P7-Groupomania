@@ -41,7 +41,7 @@ exports.createPost = async (req, res) => {
 
     res.status(201).json(createdPost);
   } catch (error) {
-    res.status(400).json(error);
+    res.status(400).json({ erreur: error });
   }
 };
 
@@ -74,7 +74,6 @@ exports.getAllPosts = async (req, res) => {
     res.status(200).send(posts);
   } catch (e) {
     res.status(400).json(e);
-    console.log(e);
   }
 };
 
@@ -100,7 +99,6 @@ exports.deletePost = async (req, res) => {
       return res.status(200).send("message supprimé");
     }
   } catch (error) {
-    console.log(error);
     return res.status(401).send(error);
   }
 };
@@ -113,7 +111,6 @@ exports.editPost = async (req, res) => {
         return res.status(401).send({ erreur: "Action non autorisée" });
       }
     }
-    console.log(req.body.post.length);
     if (req.body.post.length <= 1) {
       return res.status(401).send({ erreur: "Veuillez renseigner ce champ" });
     } else {

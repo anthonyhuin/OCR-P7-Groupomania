@@ -1,7 +1,4 @@
 <script setup>
-import { z } from "zod";
-import { toFormValidator } from "@vee-validate/zod";
-import { useField, useForm } from "vee-validate";
 import moment from "moment";
 import "moment/dist/locale/fr";
 import axios from "axios";
@@ -10,13 +7,11 @@ import { ref, watch } from "vue";
 import { useRoute } from "vue-router";
 import EditPost from "./EditPost.vue";
 import { notify } from "@kyvg/vue3-notification";
-import "animate.css";
+
 const profilStore = useProfil();
 const userStore = useUser();
 const route = useRoute();
 let inputComment = ref([]);
-
-
 
 function setLike(postId, index) {
   axios
@@ -96,9 +91,6 @@ function formatTime(time) {
   return moment(time, "YYYY-MM-DD hh-mm-ss").subtract(-2, "hours").fromNow();
 }
 
-
-
-
 function createComment(postId, comment, index) {
   const body = { comment: comment };
   axios
@@ -122,26 +114,6 @@ function notification(title, type, duration) {
   });
 }
 
-function editPost(postId, postContent) {
-  let data = {
-    post: postContent,
-  };
-  axios
-    .patch(`/api/post/${postId}`, data)
-    .then((response) => {
-
-      notify({
-        type: "success",
-        title: "Post modifié",
-      });
-    })
-    .catch((error) => {
-      notify({
-        type: "error",
-        title: error.response.data.erreur,
-      });
-    });
-}
 </script>
 
 <template>
