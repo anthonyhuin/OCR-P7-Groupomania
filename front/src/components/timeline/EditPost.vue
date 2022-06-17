@@ -63,8 +63,8 @@ postValue.value = props.post;
           <div class="field name-input">
             <label class="label" for="post">Modifier le post</label>
 
-            <resize-textarea name="post" id="post" :rows="2" :cols="4" :maxHeight="500" v-model.trim="postValue">
-            </resize-textarea>
+            <textarea name="post" id="post" rows="2" cols="4" v-model.trim="postValue">
+            </textarea>
             <p v-if="postError" class="field-error">{{ postError }}</p>
           </div>
           <div class="form-controls">
