@@ -29,6 +29,7 @@ app.use("/api/like", likeApi);
 app.use("/api/comment", commentApi);
 app.use("/api/profil", profiltApi);
 
-app.listen(8000, () => console.log("server up and running"));
+app.set("port", 8000);
+app.listen(app.get("port"), () => console.log("server up and running"));
 
 module.exports = app;

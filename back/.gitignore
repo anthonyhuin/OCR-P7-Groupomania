@@ -17,9 +17,9 @@ coverage
 # /keys/jwtRS256.key.pub
 /cypress/videos/
 /cypress/screenshots/
-/uploads/banner/*
-/uploads/profil/*
-/uploads/posts/*
+# /uploads/banner/*
+# /uploads/profil/*
+# /uploads/posts/*
 
 .vscode/*
 !.vscode/extensions.json
