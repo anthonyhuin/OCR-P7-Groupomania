@@ -36,7 +36,7 @@ function getInfoProfil() {
       })
   }
 }
-
+getInfoProfil()
 
 function formatTime(time, method) {
   if (method == "birthdate") {

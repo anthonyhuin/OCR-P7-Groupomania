@@ -11,11 +11,10 @@ const userStore = useUser();
 
 const validationSchema = toFormValidator(
   z.object({
-    email: z.string({ required_error: "Veuillez renseigner ce champ" }).email("Format email incorrect").nonempty().regex(new RegExp(/^\S*$/), "L'email ne doit pas contenir d'espace"),
+    email: z.string({ required_error: "Veuillez renseigner ce champ" }).email("Format email incorrect").nonempty("Veuillez renseigner ce champ").regex(new RegExp(/^\S*$/), "L'email ne doit pas contenir d'espace"),
     password: z
       .string({ required_error: "Veuillez renseigner ce champ" })
       .min(5, "Le mot de passe doit faire au moins 5 caractères")
-      .nonempty()
       .regex(new RegExp(/^\S*$/), "Le mot de passe ne doit pas contenir d'espace"),
   })
 );
@@ -42,18 +41,22 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
 </script>
 <template>
   <div class="container">
-    <div class="logo"></div>
+    <div class="logo"><img src="@/assets/images/icon-left-font-monochrome-black.svg" alt=""></div>
     <div class="card">
       <h1 class="card__title">Connexion</h1>
-      <p class="card__subtitle">Tu n'as pas encore de compte ? <router-link to="/signin" class="card__action">Créer un compte</router-link></p>
+      <p class="card__subtitle">Tu n'as pas encore de compte ? <router-link to="/signin" class="card__action">Créer un
+          compte</router-link>
+      </p>
 
       <form @submit.prevent="submit">
         <div class="form-row">
-          <input v-model="emailValue" id="email" class="form-row__input" type="text" placeholder="Adresse mail" />
+          <input autocomplete v-model="emailValue" id="email" class="form-row__input" type="text"
+            placeholder="Adresse mail" />
           <p v-if="emailError" class="form-error">{{ emailError }}</p>
         </div>
         <div class="form-row">
-          <input v-model="passwordValue" id="signupassword" class="form-row__input" type="password" placeholder="Mot de passe" />
+          <input autocomplete v-model="passwordValue" id="signupassword" class="form-row__input" type="password"
+            placeholder="Mot de passe" />
           <p v-if="passwordError" class="form-error">{{ passwordError }}</p>
         </div>
         <div class="form-row">
@@ -63,6 +66,7 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
         </div>
       </form>
     </div>
+    <div></div>
   </div>
 </template>
 
@@ -73,27 +77,21 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
   padding: 0;
   box-sizing: border-box;
 }
+
 .container {
   background: var(--background);
   display: flex;
   align-items: center;
-  justify-content: center;
   min-height: 90vh;
   padding: 32px;
-  position: relative;
   overflow: hidden;
+  flex-direction: column;
+  justify-content: space-between
 }
+
 .logo {
   height: 80px;
   max-width: 400px;
-  position: absolute;
-  top: 2%;
-  right: calc(50%);
-  transform: translateX(50%);
-  background: url("../assets/images/icon-left-font-monochrome-black.svg");
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 100% 100%;
   width: 100%;
 }
 
@@ -106,19 +104,23 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
   border: var(--border);
   box-shadow: var(--box-shadow);
 }
+
 .card__title {
   text-align: center;
   font-weight: 800;
 }
+
 .card__subtitle {
   text-align: center;
   color: var(--text-color);
   font-weight: 500;
 }
+
 .card__action {
   color: var(--primary-1);
   cursor: pointer;
 }
+
 .button {
   background: var(--primary-1);
   color: white;
@@ -130,6 +132,7 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
   padding: 16px;
   transition: 0.4s background-color;
 }
+
 .button:hover {
   cursor: pointer;
   background: var(--primary-2);
@@ -142,15 +145,18 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
   flex-wrap: wrap;
   flex-direction: column;
 }
+
 .form-column {
   display: flex;
   flex-direction: row;
   gap: 16px;
 }
+
 .form-error {
   color: var(--danger-1);
   font-weight: 500;
 }
+
 .form-row__input {
   padding: 8px;
   border: none;
@@ -162,12 +168,14 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
   min-width: 100px;
   color: black;
 }
+
 .form-row__input::placeholder {
   color: #696969;
 }
+
 @media only screen and (max-width: 800px) {
-  .logo {
-    display: none;
+  .container {
+    padding: 10px;
   }
 }
 </style>

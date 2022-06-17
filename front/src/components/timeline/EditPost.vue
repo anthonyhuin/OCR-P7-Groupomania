@@ -25,14 +25,12 @@ const { handleSubmit, setErrors } = useForm({
 });
 
 const submit = handleSubmit(async (formValue) => {
-  console.log(formValue);
+
   try {
     axios
       .patch(`/api/post/${props.postId}`, formValue)
       .then((response) => {
-        console.log(postStore.posts[props.index].post);
-        console.log(response.data);
-        postStore.posts[props.index].post = response.data;
+        postStore.posts[props.index].post = response.data.toString();
         postStore.posts[props.index].editPost = false;
         notify({
           type: "success",

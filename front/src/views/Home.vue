@@ -4,17 +4,18 @@ import Aside from "../components/aside/Aside.vue";
 import { useRouter } from "vue-router";
 import { useUser } from "@/shared/stores";
 
+const userStore = useUser();
+const router = useRouter();
+
 async function logout() {
   await userStore.logout();
   router.push("/login");
 }
 
-const userStore = useUser();
-const router = useRouter();
 </script>
 
 <template>
-  <div class="appcontainer">
+  <div class="appcontainer" v-if="userStore.currentUser != null">
     <Nav class="nav" @logout="logout" />
     <router-view class="content" @logout="logout"></router-view>
     <Aside class="aside" />
