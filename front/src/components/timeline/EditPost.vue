@@ -61,7 +61,7 @@ postValue.value = props.post;
           <div class="field name-input">
             <label class="label" for="post">Modifier le post</label>
 
-            <textarea name="post" id="post" rows="2" cols="4" v-model.trim="postValue">
+            <textarea name="post" id="post" v-model.trim="postValue">
             </textarea>
             <p v-if="postError" class="field-error">{{ postError }}</p>
           </div>
@@ -102,6 +102,19 @@ postValue.value = props.post;
   border-radius: var(--border-radius);
   min-width: 300px;
   padding: 0 20px;
+  width: 500px;
+}
+
+@media only screen and (max-width: 800px) {
+  .edit_profil {
+
+    width: 95%;
+    justify-content: center
+  }
+
+  textarea {
+    min-height: 200px !important;
+  }
 }
 
 .form {
@@ -116,6 +129,7 @@ postValue.value = props.post;
 
 .input,
 textarea {
+  resize: vertical;
   height: 40px;
   border: 1px solid #dcdcdc;
   border-radius: 6px;
@@ -135,7 +149,7 @@ textarea {
 }
 
 textarea {
-  height: 70px;
+  height: 200px;
 }
 
 .label {

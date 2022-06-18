@@ -50,7 +50,7 @@ const submit = handleSubmit(async (formValue) => {
       .catch((error) => {
         notify({
           type: "error",
-          title: error.response.data,
+          title: error.response.data.erreur,
         });
       });
 
@@ -136,7 +136,6 @@ function changeProfilPicture(e) {
             notification("Image de profil modifiée", "success");
           })
           .catch((error) => {
-            console.log(error);
             notification(error.response.data.erreur, "error");
           });
       } else {

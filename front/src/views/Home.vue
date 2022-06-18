@@ -49,6 +49,7 @@ async function logout() {
   border: var(--border);
   min-height: 300px;
   transition: 0.4s linear;
+  z-index: 999;
 }
 
 .aside {

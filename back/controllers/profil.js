@@ -53,6 +53,15 @@ exports.modifyProfil = async (req, res) => {
   try {
     let user = await User.findOne({ attributes: { exclude: ["password"] }, where: { id: req.user.id } });
 
+    if (req.body.birthday !== null) {
+      let birthdate = req.body.birthday.split("-");
+      let date = new Date();
+      let year = date.getFullYear();
+      if (year - birthdate[0] < 18) {
+        throw "Âge minimum  : 18 ans";
+      }
+    }
+
     user.set({
       bio: req.body.bio,
       birthdate: req.body.birthday,
