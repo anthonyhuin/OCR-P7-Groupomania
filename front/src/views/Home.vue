@@ -48,7 +48,6 @@ async function logout() {
   border-radius: var(--border-radius);
   border: var(--border);
   min-height: 300px;
-  transition: 0.4s linear;
   z-index: 999;
 }
 

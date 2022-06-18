@@ -22,8 +22,14 @@ const userStore = useUser();
           <router-link to="/params" class="menu_link"><i class="fa-fw fa-solid fa-gear"></i><span
               class="menu_text">Paramètres</span></router-link>
         </li>
+        <li class="menu_account_mobile">
+          <span @click="emit('logout')" class="pseudo"><i class="logout fa-solid fa-right-from-bracket"></i>
+
+          </span>
+        </li>
       </ul>
     </nav>
+
     <div class="menu_account">
       <img :src="userStore.currentUser.profilePicture" class="profil_pic profil_pseudo" alt="" />
       <span @click="emit('logout')" class="pseudo"><span class="pseudo_pseudo">Déconnexion</span> <i
@@ -35,6 +41,10 @@ const userStore = useUser();
 <style type="scss" scoped>
 .router-link-exact-active {
   color: var(--primary-1) !important;
+}
+
+.menu_account_mobile {
+  display: none;
 }
 
 nav {
@@ -131,6 +141,16 @@ li a:hover {
 
   .menu_account {
     display: none;
+  }
+
+  .menu_account_mobile {
+    display: block;
+  }
+
+  .logout {
+    padding: 10px;
+    margin-left: 0;
+
   }
 
   ul {

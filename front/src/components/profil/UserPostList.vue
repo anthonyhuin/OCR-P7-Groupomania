@@ -208,6 +208,10 @@ function notification(title, type, duration) {
 </template>
 
 <style lang="scss" scoped>
+.container {
+  margin-bottom: 60px;
+}
+
 .input_comment {
   height: 30px;
 }

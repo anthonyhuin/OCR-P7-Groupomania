@@ -41,7 +41,7 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
 </script>
 <template>
   <div class="container">
-    <div class="logo"><img src="@/assets/images/icon-left-font-monochrome-black.svg" alt=""></div>
+    <div class="logo"><img src="@/assets/images/icon-left-font.png" alt=""></div>
     <div class="card">
       <h1 class="card__title">Connexion</h1>
       <p class="card__subtitle">Tu n'as pas encore de compte ? <router-link to="/signin" class="card__action">Créer un
@@ -90,8 +90,7 @@ const { value: passwordValue, errorMessage: passwordError } = useField("password
 }
 
 .logo {
-  height: 80px;
-  max-width: 400px;
+  max-width: 520px;
   width: 100%;
 }
 
