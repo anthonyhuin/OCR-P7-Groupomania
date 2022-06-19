@@ -11,12 +11,17 @@ Technologies utilisées :
 Créez un fichier `.env` à la racine du dossier backend, copiez-collez ce qui suit en y ajoutant vos informations :
 
     DB_HOST=""
+    DB_PORT=""
     DB_USER=""
     DB_PASSWORD=""
     DB_NAME=""
-    PORT="8000"
+    API_PORT="8000"
 
 Les tables se créeront automatiquement lors du lancement du backend
+
+Si `API_PORT` est modifié, veillez à également modifier cette ligne dans le fichier `vite.config.js` qui se trouve à la racine du dossier frontend
+
+> "/api": "http://localhost:8000",
 
 ## Frontend
 

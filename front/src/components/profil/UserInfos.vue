@@ -21,7 +21,6 @@ watch(
   () => route.params.id,
   () => {
     getInfoProfil();
-    console.log(infoProfil.value);
   }
 );
 
