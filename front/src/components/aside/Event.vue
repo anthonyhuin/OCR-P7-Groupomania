@@ -3,20 +3,18 @@ import axios from "axios";
 import { ref } from "vue";
 
 const birthdateUsers = ref([]);
-function getsuggestUsers() {
-  axios
-    .get("/api/user/findbirthday")
+
+function findBirthday() {
+  axios.get("/api/user/findbirthday")
     .then((response) => {
       birthdateUsers.value = response.data;
 
     })
     .catch((error) => {
-      console.log(error.response.data);
+      console.log(error.response.data.erreur);
     });
 }
-getsuggestUsers();
-
-
+findBirthday();
 
 </script>
 

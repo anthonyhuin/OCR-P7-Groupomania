@@ -6,7 +6,7 @@ import { useField, useForm } from "vee-validate";
 import axios from "axios";
 import { useUser } from "@/shared/stores";
 import { useRoute } from "vue-router";
-import { ref, watch } from "vue";
+import { ref } from "vue";
 const route = useRoute();
 const userStore = useUser();
 const imageBanner = ref(null);
@@ -36,12 +36,12 @@ const submit = handleSubmit(async (formValue) => {
     axios
       .patch(`/api/profil/${route.params.id}`, body)
       .then((response) => {
-        userStore.currentUser.firstName = firstNameValue.value;
-        userStore.currentUser.birthdate = birthdayValue.value;
-        userStore.currentUser.lastName = lastNameValue.value;
-        userStore.currentUser.location = locationValue.value;
-        userStore.currentUser.job = jobValue.value;
-        userStore.currentUser.bio = bioValue.value;
+        userStore.currentUser.firstName = response.data.firstName;
+        userStore.currentUser.birthdate = response.data.birthdate;
+        userStore.currentUser.lastName = response.data.lastName;
+        userStore.currentUser.location = response.data.location;
+        userStore.currentUser.job = response.data.job;
+        userStore.currentUser.bio = response.data.bio;
         notify({
           type: "success",
           title: "Profil modifié",
@@ -159,7 +159,7 @@ function changeProfilPicture(e) {
           accept="image/png, image/jpeg, image/jpg, image/gif" />
         <label for="picture" class="label_background"
           :style="{ backgroundImage: `url(${userStore.currentUser.bannerPicture})` }">
-          <div class="tesssst1"></div>
+          <div class="hover_banner"></div>
 
           <i class="fa-solid fa-image icon_banner"></i>
         </label>
@@ -167,7 +167,7 @@ function changeProfilPicture(e) {
           accept="image/png, image/jpeg, image/jpg, image/gif" />
         <label for="picturepp" class="label_picturepp"
           :style="{ backgroundImage: `url(${userStore.currentUser.profilePicture})` }">
-          <div class="tesssst2"></div>
+          <div class="hover_pp"></div>
           <i class="fa-solid fa-image icon_pp"></i>
         </label>
 
@@ -176,35 +176,38 @@ function changeProfilPicture(e) {
 
       <form @submit.prevent="submit">
         <div class="form">
-          <div class="field name-input">
-            <label class="label" for="username">Prénom</label>
-            <input v-model.trim="firstNameValue" type="text" class="input username" name="username" id="firstname" />
+          <div class="field">
+            <label class="label" for="label_input">Prénom</label>
+            <input v-model.trim="firstNameValue" type="text" class="input label_input" name="label_input"
+              id="firstname" />
             <p v-if="firstNameError" class="field-error">{{ firstNameError }}</p>
           </div>
-          <div class="field name-input">
-            <label class="label" for="username">Nom</label>
-            <input v-model.trim="lastNameValue" type="text" class="input username" name="username" id="lastname" />
+          <div class="field">
+            <label class="label" for="label_input">Nom</label>
+            <input v-model.trim="lastNameValue" type="text" class="input label_input" name="label_input"
+              id="lastname" />
             <p v-if="lastNameError" class="field-error">{{ lastNameError }}</p>
           </div>
-          <div class="field birthday-input">
+          <div class="field">
             <label class="label" for="birthday">Date de naissance</label>
             <input v-model.trim="birthdayValue" type="date" class="input birthday" name="birthday" id="birthday" />
             <p v-if="birthdayError" class="field-error">{{ birthdayError }}</p>
           </div>
-          <div class="field name-input">
-            <label class="label" for="username">Localisation</label>
-            <input v-model.trim="locationValue" type="text" class="input username" name="username" id="location" />
+          <div class="field">
+            <label class="label" for="label_input">Localisation</label>
+            <input v-model.trim="locationValue" type="text" class="input label_input" name="label_input"
+              id="location" />
             <p v-if="locationError" class="field-error">{{ locationError }}</p>
           </div>
-          <div class="field name-input">
-            <label class="label" for="username">Poste</label>
-            <input v-model.trim="jobValue" type="text" class="input username" name="username" id="job" />
+          <div class="field">
+            <label class="label" for="label_input">Poste</label>
+            <input v-model.trim="jobValue" type="text" class="input label_input" name="label_input" id="job" />
             <p v-if="jobError" class="field-error">{{ jobError }}</p>
           </div>
         </div>
-        <div class="field name-input">
-          <label class="label" for="username">Bio</label>
-          <textarea v-model.trim="bioValue" type="text" name="username" id="bio" />
+        <div class="field">
+          <label class="label" for="label_input">Bio</label>
+          <textarea v-model.trim="bioValue" type="text" name="label_input" id="bio" />
           <p v-if="bioError" class="field-error">{{ bioError }}</p>
         </div>
         <div class="form-controls">
@@ -216,22 +219,20 @@ function changeProfilPicture(e) {
   </div>
 </template>
 <style lang="scss" scoped>
-.tesssst1 {
+.hover_banner {
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.3);
   transition: 0.2s;
 }
 
-.tesssst2 {
+.hover_pp {
   border-radius: 50%;
   width: 100%;
   height: 100%;
   background-color: rgba(0, 0, 0, 0.3);
   transition: 0.2s;
 }
-
-
 
 .edit_image {
   position: relative;
@@ -260,8 +261,7 @@ function changeProfilPicture(e) {
     transform: translate(-50%, -50%);
   }
 
-  &:hover .tesssst1 {
-
+  &:hover .hover_banner {
     background-color: rgba(0, 0, 0, 0.6);
   }
 }
@@ -293,8 +293,7 @@ function changeProfilPicture(e) {
     transform: translate(-50%, -50%);
   }
 
-  &:hover .tesssst2 {
-
+  &:hover .hover_pp {
     background-color: rgba(0, 0, 0, 0.6);
   }
 }
@@ -313,14 +312,6 @@ function changeProfilPicture(e) {
   /* "hand" cursor */
 }
 
-
-
-
-
-
-
-
-////////////////////////////////
 .edit_container {
   position: fixed;
   inset: 0;
@@ -329,7 +320,7 @@ function changeProfilPicture(e) {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 100;
+  z-index: 999;
 }
 
 .field-error {
@@ -348,6 +339,8 @@ function changeProfilPicture(e) {
   min-width: 500px;
   overflow: hidden;
   padding: 0 20px;
+
+
 }
 
 .form {
@@ -362,7 +355,7 @@ function changeProfilPicture(e) {
 
 .input,
 textarea {
-  height: 40px;
+  min-height: 40px;
   border: 1px solid #dcdcdc;
   border-radius: 6px;
   font-family: var(--font-family);
@@ -408,7 +401,6 @@ textarea {
   .submit {
     color: var(--white);
     border: none;
-    // box-shadow: 3px 5px 40px lighten($purple, 17%);
   }
 
   .cancel {
@@ -422,20 +414,13 @@ textarea {
   }
 }
 
-.disabled {
-  background-color: #dcdcdc;
-}
-
-.birthday {
-  font-family: var(--font-family);
-}
-
 @media only screen and (max-width: 800px) {
-
   .edit_profil {
     width: 100% !important;
     height: 100% !important;
     min-width: 200px;
+    overflow-y: scroll;
+    overflow-x: hidden;
   }
 
 }

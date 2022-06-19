@@ -1,5 +1,6 @@
 <script setup>
 import { useUser } from "@/shared/stores";
+
 const emit = defineEmits(["logout"]);
 const userStore = useUser();
 </script>
@@ -7,33 +8,34 @@ const userStore = useUser();
 <template>
   <aside>
     <nav>
-      <img src="@/assets/images/icon-left-font-monochrome-black.svg" class="logo" alt="" />
+      <img src="@/assets/images/icon-left-font-monochrome-black.svg" class="logo" alt="Logo Groupomania" />
       <ul>
         <li>
-          <router-link to="/" class="menu_link"><i class="fa-fw fa-solid fa-house"></i><span
-              class="menu_text">Accueil</span> </router-link>
+          <router-link to="/" class="menu_link">
+            <i class="fa-fw fa-solid fa-house"></i><span class="menu_text">Accueil</span>
+          </router-link>
         </li>
         <li>
-          <router-link :to="'/profil/' + userStore.currentUser.id" class="menu_link"><i
-              class="fa-fw fa-solid fa-user"></i><span class="menu_text">Profil</span></router-link>
+          <router-link :to="'/profil/' + userStore.currentUser.id" class="menu_link">
+            <i class="fa-fw fa-solid fa-user"></i><span class="menu_text">Profil</span>
+          </router-link>
         </li>
 
         <li>
-          <router-link to="/params" class="menu_link"><i class="fa-fw fa-solid fa-gear"></i><span
-              class="menu_text">Paramètres</span></router-link>
+          <router-link to="/params" class="menu_link">
+            <i class="fa-fw fa-solid fa-gear"></i><span class="menu_text">Paramètres</span>
+          </router-link>
         </li>
         <li class="menu_account_mobile">
-          <span @click="emit('logout')" class="pseudo"><i class="logout fa-solid fa-right-from-bracket"></i>
-
-          </span>
+          <span @click="emit('logout')" class="logout_card"><i class="logout fa-solid fa-right-from-bracket"></i></span>
         </li>
       </ul>
     </nav>
 
     <div class="menu_account">
-      <img :src="userStore.currentUser.profilePicture" class="profil_pic profil_pseudo" alt="" />
-      <span @click="emit('logout')" class="pseudo"><span class="pseudo_pseudo">Déconnexion</span> <i
-          class="logout fa-solid fa-arrow-right-from-bracket"></i></span>
+      <img :src="userStore.currentUser.profilePicture" class="profil_pic profil_pseudo" alt="Image de Profil" />
+      <span @click="emit('logout')" class="logout_card"><span class="logout_text">Déconnexion</span>
+        <i class="logout fa-solid fa-arrow-right-from-bracket"></i></span>
     </div>
   </aside>
 </template>
@@ -67,16 +69,7 @@ li a {
   color: var(--text-color);
 }
 
-@media only screen and (max-width: 900px) {
-  .menu_text {
-    font-size: 1rem;
-  }
 
-  .fa-solid {
-    margin-right: 10px;
-    font-size: 1.5rem;
-  }
-}
 
 li a:hover {
   background-color: rgb(209, 208, 208);
@@ -117,9 +110,20 @@ li a:hover {
   text-decoration: none;
 }
 
-.pseudo {
+.logout_card {
   font-weight: 500;
   cursor: pointer;
+}
+
+@media only screen and (max-width: 900px) {
+  .menu_text {
+    font-size: 1rem;
+  }
+
+  .fa-solid {
+    margin-right: 10px;
+    font-size: 1.5rem;
+  }
 }
 
 @media only screen and (max-width: 800px) {
@@ -188,7 +192,7 @@ li a:hover {
     display: none;
   }
 
-  .pseudo_pseudo {
+  .logout_text {
     display: none;
   }
 

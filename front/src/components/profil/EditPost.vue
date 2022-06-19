@@ -16,7 +16,7 @@ let props = defineProps({
 
 const validationSchema = toFormValidator(
   z.object({
-    post: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty().max(500, "Le post doit faire moins de 500 caractères"),
+    post: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty("Veuillez renseigner ce champ").max(500, "Le post doit faire moins de 500 caractères"),
   })
 );
 
@@ -24,28 +24,24 @@ const { handleSubmit, setErrors } = useForm({
   validationSchema,
 });
 
-const submit = handleSubmit(async (formValue) => {
-  try {
-    axios
-      .patch(`/api/post/${props.postId}`, formValue)
-      .then((response) => {
-        profilStore.posts[props.index].post = response.data;
-        profilStore.posts[props.index].editPost = false;
-        notify({
-          type: "success",
-          title: "Post modifié",
-        });
-      })
-      .catch((error) => {
-        console.log(error);
-        notify({
-          type: "error",
-          title: error,
-        });
+const submit = handleSubmit((formValue) => {
+  axios
+    .patch(`/api/post/${props.postId}`, formValue)
+    .then((response) => {
+      profilStore.posts[props.index].post = response.data;
+      profilStore.posts[props.index].editPost = false;
+      notify({
+        type: "success",
+        title: "Post modifié",
       });
-  } catch (e) {
-    setErrors({ post: e });
-  }
+    })
+    .catch((error) => {
+      console.log(error);
+      notify({
+        type: "error",
+        title: error,
+      });
+    });
 });
 
 const { value: postValue, errorMessage: postError } = useField("post");
@@ -57,7 +53,7 @@ postValue.value = props.post;
     <div v-on:click.stop class="edit_profil">
       <form @submit.prevent="submit">
         <div class="form">
-          <div class="field name-input">
+          <div class="field">
             <label class="label" for="post">Modifier le post</label>
             <textarea name="post" id="post" v-model="postValue">
             </textarea>

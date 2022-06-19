@@ -8,7 +8,6 @@ function getsuggestUsers() {
     .get("/api/user/suggest")
     .then((response) => {
       suggetsUsers.value = response.data;
-
     })
     .catch((error) => {
       console.log(error);
@@ -20,10 +19,10 @@ getsuggestUsers();
   <div class="suggest">
     <h2>Suggestions</h2>
 
-    <div class="friend" v-for="user in suggetsUsers">
-      <img :src="user.profilePicture" class="profil_pic" alt="" />
+    <div class="card" v-for="user in suggetsUsers">
+      <img :src="user.profilePicture" class="profil_pic" alt="Photo de profil" />
       <div class="form-button">
-        <router-link :to="'/profil/' + user.id" class="menu_link">
+        <router-link :to="'/profil/' + user.id">
           <h3>{{ user.firstName + " " + user.lastName }}</h3>
         </router-link>
         <button class="btn">
@@ -44,11 +43,11 @@ getsuggestUsers();
   border-radius: var(--border-radius);
 }
 
-.suggest .friend:not(:nth-child(0n + 2)) {
+.suggest .card:not(:nth-child(0n + 2)) {
   border-top: var(--border-in);
 }
 
-.friend {
+.card {
   display: flex;
   align-items: center;
   gap: 10px;

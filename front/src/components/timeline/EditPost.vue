@@ -52,7 +52,7 @@ postValue.value = props.post;
     <div v-on:click.stop class="edit_profil">
       <form @submit.prevent="submit">
         <div class="form">
-          <div class="field name-input">
+          <div class="field">
             <label class="label" for="post">Modifier le post</label>
 
             <textarea name="post" id="post" v-model.trim="postValue">

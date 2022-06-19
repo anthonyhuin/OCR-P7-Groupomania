@@ -31,19 +31,21 @@ function disableAccount() {
 
 <template>
   <div>
-    <h1>Paramètres</h1>
     <div class="card">
-      <h4><i class="fa-solid fa-triangle-exclamation"></i> Ceci désactivera votre compte.</h4>
+      <h3><i class="fa-solid fa-triangle-exclamation"></i> Ceci désactivera votre compte.</h3>
       <p>
-        Vous vous apprêtez à lancer la procédure de désactivation de votre compte Groupomania. Votre nom d'affichage,
+        Vous vous apprêtez à lancer la procédure de désactivation de votre compte Groupomania.</p>
+      <p> Votre nom
+        d'affichage,
         vos posts, vos commentaires et votre profil ne seront plus visibles sur
         Groupomania.com.
       </p>
-      <div v-if="!confirmDisable" class="form-controls"><button class="btn danger"
-          @click="confirmDisable = true">Désactiver mon compte</button></div>
+      <div v-if="!confirmDisable" class="form-controls">
+        <button class="btn danger" @click="confirmDisable = true">Désactiver mon compte</button>
+      </div>
       <div v-else class="form-controls">
-        <button class="btn neutral" @click="confirmDisable = false">Annuler</button> <button class="btn danger"
-          @click="disableAccount">Désactiver mon compte</button>
+        <button class="btn neutral" @click="confirmDisable = false">Annuler</button>
+        <button class="btn danger" @click="disableAccount">Désactiver mon compte</button>
       </div>
     </div>
   </div>
