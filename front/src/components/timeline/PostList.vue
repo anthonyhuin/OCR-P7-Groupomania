@@ -119,7 +119,7 @@ function displayOptionBtn(postUserId) {
     <article class="card" v-for="(post, index) in postStore.posts">
       <div class="card_header">
         <div class="header_pp"><img :alt="`Photo de profil de ${post.User.firstName + ' ' + post.User.firstName}`"
-            :src="post.User.profilePicture" class="fake_pp" /></div>
+            :src="post.User.profilePicture" class="profil_picture" /></div>
 
         <div class="header_info">
           <router-link :to="'/profil/' + post.User.id" class="menu_link">
@@ -163,7 +163,7 @@ function displayOptionBtn(postUserId) {
 
       <div v-for="(comment, key) in post.Comments" class="card_comment">
         <div class="comment_container">
-          <div class="comment_pp"><img :src="comment.User.profilePicture" class="fake_pp_comment" /></div>
+          <div class="comment_pp"><img :src="comment.User.profilePicture" class="profil_picture_comment" /></div>
           <div class="comment_bulle">
             <div class="comment_pseudo">
               <router-link :to="'/profil/' + comment.User.id" class="menu_link">{{ comment.User.firstName }} {{
@@ -181,7 +181,7 @@ function displayOptionBtn(postUserId) {
       </div>
 
       <div class="card_form">
-        <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="fake_pp_comment" /></div>
+        <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="profil_picture_comment" /></div>
         <form
           @submit.prevent="createComment(post.id, this.inputComment[index], index), (this.inputComment[index] = null)"
           class="card_form_input">
@@ -296,7 +296,7 @@ form {
   color: var(--danger-1);
 }
 
-.fake_pp {
+.profil_picture {
   height: 45px;
   width: 45px;
   border-radius: 50%;
@@ -306,7 +306,7 @@ form {
   object-fit: cover;
 }
 
-.fake_pp_comment {
+.profil_picture_comment {
   height: 30px;
   width: 30px;
   border-radius: 50%;

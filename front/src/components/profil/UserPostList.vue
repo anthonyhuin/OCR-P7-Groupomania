@@ -114,6 +114,12 @@ function notification(title, type, duration) {
   });
 }
 
+function displayOptionBtn(postUserId) {
+  if (userStore.currentUser.id == postUserId || userStore.currentUser.roles == 'admin')
+    return true
+  else return false
+}
+
 </script>
 
 <template>
@@ -125,7 +131,7 @@ function notification(title, type, duration) {
   <div v-else class="container">
     <div class="card" v-for="(post, index) in profilStore.posts">
       <div class="card_header">
-        <div class="header_pp"><img :src="post.User.profilePicture" class="fake_pp" /></div>
+        <div class="header_pp"><img :src="post.User.profilePicture" class="profil_picture" /></div>
 
         <div class="header_info">
           <router-link :to="'/profil/' + post.User.id" class="menu_link">
@@ -134,8 +140,7 @@ function notification(title, type, duration) {
           <span class="header_time">{{ formatTime(post.createdAt) }} <i class="fa-regular fa-clock"></i></span>
         </div>
 
-        <div class="header_edit"
-          v-if="userStore.currentUser.id == post.User.id || userStore.currentUser.roles == 'admin'"
+        <div class="header_edit" v-if="displayOptionBtn(post.User.id)"
           @click="profilStore.posts[index].editMode = !profilStore.posts[index].editMode">
           <i class="fa-solid fa-ellipsis"></i>
 
@@ -173,14 +178,13 @@ function notification(title, type, duration) {
 
       <div v-for="(comment, key) in post.Comments" class="card_comment">
         <div class="comment_container">
-          <div class="comment_pp"><img :src="comment.User.profilePicture" class="fake_pp_comment" /></div>
+          <div class="comment_pp"><img :src="comment.User.profilePicture" class="profil_picture_comment" /></div>
           <div class="comment_bulle">
             <div class="comment_pseudo">
               <router-link :to="'/profil/' + comment.User.id" class="menu_link">{{ comment.User.firstName + " " +
                   comment.User.lastName
               }}</router-link>
-              <div class="comment_edit"
-                v-if="userStore.currentUser.id === comment.User.id || userStore.currentUser.roles == 'admin'"
+              <div class="comment_edit" v-if="displayOptionBtn(comment.User.id)"
                 @click="deleteComment(comment.id, index, key)">
                 <i class="fa-solid fa-trash-can"></i>
               </div>
@@ -192,7 +196,7 @@ function notification(title, type, duration) {
       </div>
 
       <div class="card_form">
-        <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="fake_pp_comment" /></div>
+        <div class="form_pp"><img :src="userStore.currentUser.profilePicture" class="profil_picture_comment" /></div>
         <form
           @submit.prevent="createComment(post.id, this.inputComment[index], index), (this.inputComment[index] = null)"
           class="card_form_input">
@@ -286,7 +290,7 @@ form {
   color: var(--danger-1);
 }
 
-.fake_pp {
+.profil_picture {
   height: 38px;
   width: 38px;
   border-radius: 50%;
@@ -295,7 +299,7 @@ form {
   box-shadow: 0 0 1px 0 gray inset, 0 0 1px 0 gray;
 }
 
-.fake_pp_comment {
+.profil_picture_comment {
   height: 25px;
   width: 25px;
   border-radius: 50%;
