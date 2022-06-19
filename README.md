@@ -29,10 +29,6 @@ Ouvrir le dossier Frontend dans le terminal de votre éditeur, puis exécuter la
 
     npm install
 
-Si le navigateur ne s'ouvre pas automatiquement, allez à :
-
-- http://localhost:3000/
-
 ## Backend
 
 Ouvrir le dossier Backend dans le terminal de votre éditeur, ensuite exécuter la commande :
@@ -44,3 +40,7 @@ Ensuite
     npm start
 
 Pour exécuter le frontend et le backend simultanément
+
+Si le navigateur ne s'ouvre pas automatiquement, allez à :
+
+- http://localhost:3000/
