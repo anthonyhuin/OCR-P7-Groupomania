@@ -4,10 +4,8 @@ import { z } from "zod";
 import { toFormValidator } from "@vee-validate/zod";
 import { useField, useForm } from "vee-validate";
 import axios from "axios";
-import { useUser, usePost } from "@/shared/stores";
-import { useRoute } from "vue-router";
-const route = useRoute();
-const userStore = useUser();
+import { usePost } from "@/shared/stores";
+
 const postStore = usePost();
 const props = defineProps({
   postId: Number,
@@ -16,7 +14,7 @@ const props = defineProps({
 });
 const validationSchema = toFormValidator(
   z.object({
-    post: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty(),
+    post: z.string({ required_error: "Veuillez renseigner ce champ" }).nonempty("Veuillez renseigner ce champ"),
   })
 );
 
@@ -24,29 +22,25 @@ const { handleSubmit, setErrors } = useForm({
   validationSchema,
 });
 
-const submit = handleSubmit(async (formValue) => {
-
-  try {
-    axios
-      .patch(`/api/post/${props.postId}`, formValue)
-      .then((response) => {
-        postStore.posts[props.index].post = response.data.toString();
-        postStore.posts[props.index].editPost = false;
-        notify({
-          type: "success",
-          title: "Post modifié",
-        });
-      })
-      .catch((error) => {
-        console.log(error.response.data.erreur);
-        notify({
-          type: "error",
-          title: error.response.data.erreur,
-        });
+const submit = handleSubmit((formValue) => {
+  axios
+    .patch(`/api/post/${props.postId}`, formValue)
+    .then((response) => {
+      postStore.posts[props.index].post = response.data.toString();
+      postStore.posts[props.index].editPost = false;
+      notify({
+        type: "success",
+        title: "Post modifié",
       });
-  } catch (e) {
-    setErrors({ post: e });
-  }
+    })
+    .catch((error) => {
+      console.log(error.response.data.erreur);
+      notify({
+        type: "error",
+        title: error.response.data.erreur,
+      });
+    });
+
 });
 
 const { value: postValue, errorMessage: postError } = useField("post");
@@ -127,7 +121,7 @@ postValue.value = props.post;
   margin-bottom: 15px;
 }
 
-.input,
+
 textarea {
   resize: vertical;
   height: 40px;
@@ -188,13 +182,5 @@ textarea {
       background-color: var(--gray-1);
     }
   }
-}
-
-.disabled {
-  background-color: #dcdcdc;
-}
-
-.birthday {
-  font-family: var(--font-family);
 }
 </style>

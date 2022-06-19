@@ -21,6 +21,7 @@ watch(
   () => route.params.id,
   () => {
     getInfoProfil();
+    console.log(infoProfil.value);
   }
 );
 
@@ -32,7 +33,7 @@ function getInfoProfil() {
         infoProfil.value = response.data;
       })
       .catch(function (error) {
-        infoProfil.value = error.response.data;
+        infoProfil.value = error.response.data.erreur;
       })
   }
 }

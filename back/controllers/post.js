@@ -6,7 +6,7 @@ const Comment = db.Comment;
 const fs = require("fs");
 
 exports.createPost = async (req, res) => {
-  let data = {
+  const data = {
     userId: req.user.id,
     post: req.body.post,
     picture: req.file !== undefined ? `${req.protocol}://${req.get("host")}/posts/${req.file.filename}` : null,
@@ -40,8 +40,8 @@ exports.createPost = async (req, res) => {
     });
 
     res.status(201).json(createdPost);
-  } catch (error) {
-    res.status(400).json({ erreur: error });
+  } catch (e) {
+    res.status(400).json({ erreur: e });
   }
 };
 
@@ -73,23 +73,22 @@ exports.getAllPosts = async (req, res) => {
     });
     res.status(200).send(posts);
   } catch (e) {
-    res.status(400).json(e);
+    res.status(400).json({ erreur: e });
   }
 };
 
 exports.deletePost = async (req, res) => {
   try {
-    const post = await Post.findOne({ where: { id: req.params.id } });
+    const post = await Post.findOne({ raw: true, where: { id: req.params.id } });
 
-    if (req.user.id !== post.dataValues.userId) {
+    if (req.user.id !== post.userId) {
       if (req.user.roles != "admin") {
         return res.status(401).send({ erreur: "Action non autorisée" });
       }
     }
 
-    if (post.dataValues.picture != null) {
-      const filename = post.dataValues.picture.split("/posts/")[1];
-
+    if (post.picture != null) {
+      const filename = post.picture.split("/posts/")[1];
       fs.unlink(`uploads/posts/${filename}`, async () => {
         await Post.destroy({ where: { id: req.params.id } });
         return res.status(200).send("message supprimé");
@@ -98,10 +97,11 @@ exports.deletePost = async (req, res) => {
       await Post.destroy({ where: { id: req.params.id } });
       return res.status(200).send("message supprimé");
     }
-  } catch (error) {
-    return res.status(401).send(error);
+  } catch (e) {
+    return res.status(401).json({ erreur: e });
   }
 };
+
 exports.editPost = async (req, res) => {
   try {
     const postUserId = await Post.findOne({ raw: true, attributes: ["userId"], where: { id: req.params.id } });
@@ -113,10 +113,9 @@ exports.editPost = async (req, res) => {
     }
     if (req.body.post.length <= 1) {
       return res.status(401).send({ erreur: "Veuillez renseigner ce champ" });
-    } else {
     }
 
-    let postEdit = await Post.upsert({
+    const postEdit = await Post.upsert({
       id: req.params.id,
       post: req.body.post,
     });

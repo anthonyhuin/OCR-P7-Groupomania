@@ -18,6 +18,6 @@ exports.setLike = async (req, res) => {
       res.status(200).json({ liked: false });
     }
   } catch (e) {
-    res.status(400).json(e);
+    res.status(400).json({ erreur: e });
   }
 };

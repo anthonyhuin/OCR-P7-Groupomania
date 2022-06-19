@@ -29,7 +29,7 @@ function setLike(postId, index) {
       }
     })
     .catch((error) => {
-      notification(error.response.data.error, "error");
+      notification(error.response.data.erreur, "error");
     });
 }
 
@@ -59,7 +59,7 @@ function deleteComment(commentId, indexPost, indexComment) {
       profilStore.posts[indexPost].Comments.splice(indexComment, 1);
     })
     .catch((error) => {
-      notification(error.response.data.error, "error");
+      notification(error.response.data.erreur, "error");
     });
 }
 

@@ -41,7 +41,7 @@ exports.getInfoProfil = async (req, res) => {
   try {
     const user = await User.findOne({ attributes: { exclude: ["password"] }, raw: true, where: { id: req.params.id } });
     if (user === null) {
-      throw null;
+      throw "Utilisateur introuvable";
     }
     res.status(201).json(user);
   } catch (e) {

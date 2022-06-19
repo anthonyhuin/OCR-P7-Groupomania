@@ -28,7 +28,7 @@ function setLike(postId, index) {
       }
     })
     .catch((error) => {
-      notification(error.response.data.error, "error");
+      notification(error.response.data.erreur, "error");
     });
 }
 
@@ -69,7 +69,7 @@ function getAllPosts() {
       postStore.posts = response.data;
     })
     .catch(function (error) {
-      notification(error.response.data.error, "error");
+      notification(error.response.data.erreur, "error");
     })
     .then(function () {
       postStore.isloading = false;

@@ -11,9 +11,10 @@ exports.login = async (req, res) => {
   if (user === null) {
     res.status(401).json("Mauvais email ou mot de passe");
   } else {
-    if (user.active == 0) {
-      return res.status(400).json("Compte désactivé");
-    } else if (bcrypt.compareSync(body.password, user.password)) {
+    if (bcrypt.compareSync(body.password, user.password)) {
+      if (user.active == 0) {
+        return res.status(400).json("Compte désactivé");
+      }
       const token = jsonwebtoken.sign(
         {
           id: user.id,

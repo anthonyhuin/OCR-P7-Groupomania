@@ -13,18 +13,18 @@ exports.signIn = async (req, res) => {
     email: req.body.email,
     firstName: req.body.firstname,
     lastName: req.body.lastname,
-    profilePicture: `http://localhost:8000/default/pp.png`,
-    bannerPicture: `http://localhost:8000/default/banner.png`,
+    profilePicture: `${req.protocol}://${req.get("host")}/default/pp.png`,
+    bannerPicture: `${req.protocol}://${req.get("host")}/default/banner.png`,
     password: await bcrypt.hash(req.body.password, 8),
   };
 
   try {
-    const userexist = await User.findOne({ where: { email: req.body.email } });
-    if (userexist === null) {
+    const userExist = await User.findOne({ where: { email: req.body.email } });
+    if (userExist === null) {
       const user = await User.create(data);
       res.status(200).send(user);
     } else {
-      res.status(400).json("Utilisateur deja existant");
+      res.status(400).json("Email déjà utilisé");
     }
   } catch (e) {
     res.status(400).json(e);
@@ -91,7 +91,7 @@ exports.suggestUsers = async (req, res) => {
       limit: 3,
       where: {
         id: {
-          [Op.ne]: req.user.id,
+          [Op.ne]: req.user.id, //Op.ne : !=
         },
         active: 1,
       },

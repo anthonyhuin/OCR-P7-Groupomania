@@ -10,9 +10,9 @@ exports.createComment = async (req, res) => {
   };
 
   try {
-    const comment = await Comment.create(data);
-    const user = await User.findOne({ attributes: ["firstName", "lastName", "profilePicture", "id"], where: { id: req.user.id } });
-    data = { ...comment.dataValues, User: { ...user.dataValues } };
+    const comment = (await Comment.create(data)).get({ plain: true });
+    const user = await User.findOne({ raw: true, attributes: ["firstName", "lastName", "profilePicture", "id"], where: { id: req.user.id } });
+    data = { ...comment, User: { ...user } };
 
     res.status(201).json(data);
   } catch (error) {
@@ -22,18 +22,18 @@ exports.createComment = async (req, res) => {
 
 exports.deleteComment = async (req, res) => {
   try {
-    const comment = await Comment.findOne({ attributes: ["userId"], where: { id: req.params.id } });
+    const comment = await Comment.findOne({ raw: true, attributes: ["userId"], where: { id: req.params.id } });
 
-    if (req.user.id !== comment.dataValues.userId) {
+    if (req.user.id !== comment.userId) {
       if (req.user.roles != "admin") {
         return res.status(401).send({ erreur: "Action non autorisée" });
       }
-    } else {
-      await Comment.destroy({ where: { id: req.params.id } });
     }
+
+    await Comment.destroy({ where: { id: req.params.id } });
 
     return res.status(200).send("commentaire supprimé");
   } catch (error) {
-    return res.status(401).send(error);
+    return res.status(401).json({ erreur: error });
   }
 };
